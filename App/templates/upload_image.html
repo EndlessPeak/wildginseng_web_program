@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>野山参等级分类系统</title>
+    <link rel="stylesheet" href="static/layui/css/layui.css">
+    <link rel="stylesheet" href="static/layui/css/global.css">
+    <script src="static/layui/layui.js"></script>
+</head>
+
+<body>
+    <script>
+        layui.use(function () {
+            var element = layui.element;
+            element.render('nav');
+        });
+    </script>
+
+    <!-- header part -->
+    <div class="layui-header ws-header ws-bg-light">
+        <div class="ws-logo">
+            <a href="/">野山参等级分类系统</a>
+        </div>
+        <div class="ws-header-menu">
+            <ul class="layui-nav layui-bg-gray ws-bg-light">
+                <li class="layui-nav-item">
+                    <a href="javascript:;">子级</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="nav.html">菜单1</a></dd>
+                        <dd><a href="nav.html">菜单2</a></dd>
+                        <dd><a href="nav.html">菜单3</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">选项</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="nav.html">选项1</a></dd>
+                        <dd class="layui-this"><a href="nav.html">选项2</a></dd>
+                        <dd><a href="nav.html">选项3</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="ws-container">
+        <div class="layui-container" style="padding: 20px;display: none;">
+            <form action="/upload_image" method="POST" enctype="multipart/form-data">
+                <input type="file" name="file" />
+                <input type="submit" value="提交" class="layui-btn" />
+            </form>
+        </div>
+
+        <div class="layui-container">
+            <fieldset class="layui-elem-field" style="margin: 20px 20px;">
+                <legend>上传与裁剪</legend>
+                <div class="layui-field-box layui-text ws-text">
+                    请在下面的左框中上传文件，上传后会自动显示预览效果图，右框中会自动显示裁剪效果，点击推理会对裁剪后的图展开推理。
+                </div>
+            </fieldset>
+            <div class="layui-row layui-col-space5" style="margin: 20px 20px;">
+
+                <div class="layui-col-md6">
+                    <div class="layui-upload-drag" style="display: block; margin-top: 10px;" id="ID-upload-image-drag">
+                        <i class="layui-icon layui-icon-upload"></i>
+                        <div>点击上传，或将文件拖拽到此处</div>
+                        <div class="layui-hide" id="ID-upload-image-preview">
+                            <hr> <img src="" alt="上传成功后渲染" style="max-width: 50%">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-col-md6">
+                    <div class="layui-upload-drag" style="display: block; margin-top: 10px;">
+                        <i class="layui-icon layui-icon-survey"></i>
+                        <div>裁剪后的图片将会在此处显示</div>
+                        <div class="layui-hide" id="ID-crop-image-preview">
+                            <hr><img src="" alt="裁剪成功后渲染" style="max-width: 50%;">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-md12" style="display: flex;justify-content: center;">
+                    <button id="ID-infer-button" class="layui-btn layui-btn-disabled" lay-on="show-load-4">推理</button>
+                </div>
+                <!--
+                <div class="layui-col-md6" style="display: flex;justify-content: center;">
+                    <button class="layui-btn layui-btn-disabled">推理</button>
+                </div>
+                -->
+            </div>
+
+        </div>
+
+        <script>
+            layui.use(['upload', 'jquery', 'layer', 'util'], function () {
+                var layer = layui.layer;
+                var util = layui.util;
+                var upload = layui.upload;
+                var $ = layui.$;
+                // 渲染
+                upload.render({
+                    elem: '#ID-upload-image-drag',
+                    url: '/upload_image',
+                    done: function (res) {
+                        layer.msg('上传成功');
+                        $('#ID-upload-image-preview').removeClass('layui-hide')
+                            .find('img').attr('src', res.data.fileUrl);
+                        console.log(res)
+
+                        // 移除按钮的禁用状态
+                        $('#ID-infer-button').removeClass('layui-btn-disabled');
+
+                        // 发送请求到另一个后端接口
+                        $.ajax({
+                            url: '/crop_image',
+                            type: 'POST', // 根据实际情况选择请求类型
+                            data: {
+
+                            },
+                            success: function (response) {
+                                // 解析响应
+                                $('#ID-crop-image-preview').removeClass('layui-hide')
+                                    .find('img').attr('src', response.data.fileUrl);
+                                console.log(response);
+                            },
+                            error: function (error) {
+                                console.log(error);
+                            }
+                        });
+                    },
+                    error: function (res) {
+                        console.log(res)
+                    }
+                });
+
+                util.on('lay-on', {
+                    'show-load-4': function () {
+                        if ($('#ID-infer-button').hasClass('layui-btn-disabled')) return;
+                        // 按钮禁用时不执行下面的逻辑
+                        layer.msg('开始进行推理，请勿刷新页面！', { icon: 0 }, function () {
+                            //回调
+                            layer.msg('执行推理大约需要5-10s时间，请耐心等待。请勿刷新页面！', {
+                                icon: 16,
+                                shade: 0.05
+                            });
+                        });
+                        //var loadIndex =
+                        // 模拟关闭
+                        setTimeout(function () {
+                            layer.close(loadIndex)
+                        }, 5000);
+                    }
+                })
+
+                // 监听按钮点击事件
+                $('#ID-infer-button').click(function () {
+                    if ($(this).hasClass('layui-btn-disabled')) return; // 按钮禁用时不执行下面的逻辑
+                    window.location.href = "/infer_image";
+                });
+            });
+        </script>
+    </div>
+
+    <div class="layui-footer ws-footer">
+        <p>
+            Copyright©2023
+            开发单位: 延边大学嵌入式系统实验室
+        </p>
+    </div>
+</body>
+
+</html>

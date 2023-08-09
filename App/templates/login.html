@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>野山参等级分类系统</title>
+	<link rel="stylesheet" href="static/layui/css/layui.css">
+	<link rel="stylesheet" href="static/layui/css/global.css">
+	<script src="static/layui/layui.js"></script>
+	<script>
+		layui.use('form', function () {
+			var form = layui.form;
+		});
+	</script>
+</head>
+
+<body>
+	<script>
+		layui.use(function () {
+			var element = layui.element;
+			element.render('nav');
+		});
+	</script>
+
+	<!-- header part -->
+	<div class="layui-header ws-header ws-bg-light">
+		<div class="ws-logo">
+			<a href="/">野山参等级分类系统</a>
+		</div>
+		<div class="ws-header-menu">
+			<ul class="layui-nav layui-bg-gray ws-bg-light">
+				<li class="layui-nav-item">
+					<a href="javascript:;">子级</a>
+					<dl class="layui-nav-child">
+						<dd><a href="nav.html">菜单1</a></dd>
+						<dd><a href="nav.html">菜单2</a></dd>
+						<dd><a href="nav.html">菜单3</a></dd>
+					</dl>
+				</li>
+				<li class="layui-nav-item">
+					<a href="javascript:;">选项</a>
+					<dl class="layui-nav-child">
+						<dd><a href="nav.html">选项1</a></dd>
+						<dd class="layui-this"><a href="nav.html">选项2</a></dd>
+						<dd><a href="nav.html">选项3</a></dd>
+					</dl>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="ws-container">
+		<div class="layui-container">
+			<!-- display picture roundly -->
+			<div align=center style="padding: 20px;">
+				<div class="layui-carousel" id="test1" align=center>
+					<div carousel-item=''>
+						<div><img src="static/images/wild_ginseng_1.jpg"></div>
+						<div><img src="static/images/wild_ginseng_2.jpg"></div>
+						<div><img src="static/images/wild_ginseng_3.jpg"></div>
+					</div>
+				</div>
+			</div>
+
+			<div class="layui-row">
+				<form action="test" method="POST" class="layui-form">
+					<input type="hidden" name="method" value="login">
+					<div class="layui-form-item" style="width: 400px; margin: auto;">
+						<label class="layui-form-label">用户名</label>
+						<div class="layui-input-block">
+							<input type="text" name="username" required lay-verify="required" placeholder="请输入用户名"
+								autocomplete="off" class="layui-input">
+							<div class="layui-form-mid layui-word-aux">
+							</div>
+						</div>
+					</div>
+					<div class="layui-form-item" style="width: 400px; margin: auto;">
+						<label class="layui-form-label">密码</label>
+						<div class="layui-input-block">
+							<input type="password" name="password" required lay-verify="required" placeholder="请输入密码"
+								autocomplete="off" class="layui-input">
+							<div class="layui-form-mid layui-word-aux">
+							</div>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<div class="layui-input-block" style="display: flex;justify-content:center;">
+							<button class="layui-btn" lay-submit lay-filter="formDemo"
+								style="margin-left: -80px;">立即提交</button>
+							<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+							<a href="#" class="layui-btn layui-btn-primary">注册</a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="layui-footer ws-footer">
+		<p>
+			Copyright©2023
+			开发单位: 延边大学嵌入式系统实验室
+		</p>
+	</div>
+
+</body>
+<script>
+	layui.use('carousel', function () {
+		var carousel = layui.carousel;
+		//constructed instance 
+		carousel.render({
+			elem: '#test1',     //Container
+			width: '960px',		//Container width
+			height: '260px', 	//Container height
+			arrow: 'always', 	//always show arrows
+			autoplay: 'true',	//display automatically
+			interval: 3000		//display interval
+		});
+	});
+
+	//Reload window when it resize
+	$(window).resize(function () {
+		window.location.reload()
+	})
+
+</script>
+
+</html>

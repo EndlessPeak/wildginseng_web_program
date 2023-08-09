@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>野山参等级分类系统</title>
+    <link rel="stylesheet" href="static/layui/css/layui.css">
+    <link rel="stylesheet" href="static/layui/css/global.css">
+    <!--<link rel="stylesheet" type="text/css" href="/static/css/style.css">-->
+    <script src="static/layui/layui.js"></script>
+</head>
+
+<body>
+    <script>
+        layui.use(function () {
+            var element = layui.element;
+            element.render('nav');
+        });
+    </script>
+
+    <!-- header part -->
+    <div class="layui-header ws-header ws-bg-light">
+        <div class="ws-logo">
+            <a href="/">野山参等级分类系统</a>
+        </div>
+        <div class="ws-header-menu">
+            <ul class="layui-nav layui-bg-gray ws-bg-light">
+                <li class="layui-nav-item">
+                    <a href="javascript:;">子级</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="nav.html">菜单1</a></dd>
+                        <dd><a href="nav.html">菜单2</a></dd>
+                        <dd><a href="nav.html">菜单3</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">选项</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="nav.html">选项1</a></dd>
+                        <dd class="layui-this"><a href="nav.html">选项2</a></dd>
+                        <dd><a href="nav.html">选项3</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="ws-container">
+        <div class="layui-container" style="padding: 20px;">
+            <h1 style="text-align: center; margin:20px auto;">您好，{{ session.get("user") }}，欢迎使用野山参预测系统</h1>
+            <a href="#" class="layui-btn layui-btn-primary">查看我的参</a>
+            <a href="{{ url_for('user.upload_ginseng_image') }}" class="layui-btn">上传预测</a>
+            <a href="#" class="layui-btn layui-btn-primary">实时预测</a>
+            <a href="#" class="layui-btn layui-btn-primary">拍照预测</a>
+            <br />
+        </div>
+    </div>
+
+    <div class="layui-footer ws-footer">
+        <p>
+            Copyright©2023
+            开发单位: 延边大学嵌入式系统实验室
+        </p>
+    </div>
+</body>
+
+</html>

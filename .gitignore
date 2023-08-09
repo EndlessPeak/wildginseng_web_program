@@ -1,6 +1,6 @@
 sources
-static/output_inference
-static/layui
-static/config.json
-static/*
+App/static/output_inference
+App/static/layui
+App/static/config.json
+App/static/images
 *.pyc

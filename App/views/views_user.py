@@ -16,7 +16,7 @@
 7. jsonify              用于json数据序列化，将数据对象变成json字符串  
 '''
 from flask import Blueprint, request, send_from_directory, \
-    current_app,render_template , session, jsonify, redirect, url_for
+    current_app, render_template, session, jsonify, redirect, url_for
 from App.models.models_user import UserModel
 
 '''
@@ -34,7 +34,7 @@ blue_test = Blueprint('test',__name__)
 '''
 @blue_user.route('/login')
 def user_login():
-    return "Login page."
+    return render_template("login.html")
 
 # 检查登录状态
 def check_login_status():
@@ -54,7 +54,7 @@ def check_login_route():
 '''
 @blue_user.route('/')
 def index():
-    return "Hello World."
+    return render_template("index.html")
 
 '''
 用于获取上传文件的路由
@@ -71,6 +71,10 @@ def serve_infer_image(filename):
 @blue_user.route('/request_crop_image/<path:filename>')
 def serve_crop_image(filename):
     return send_from_directory(current_app.config['CROP_IMAGE_FOLDER'],filename)
+
+@blue_user.route('/upload_ginseng_image', methods=['GET', 'POST'])
+def upload_ginseng_image():
+    return "upload_image"
 
 '''
 可接收的路由参数
