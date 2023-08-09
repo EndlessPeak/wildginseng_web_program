@@ -5,16 +5,15 @@
 '''
 
 '''
-导入flask框架，这将包含以下内容:
-1. Flask
-2. render_template
-3. session
-4. request
-5. send_from_directory
-6. jsonify 用于json数据序列化，将数据对象变成json字符串  
+导入flask框架，本文件将包含以下内容:
+Flask
 '''
-from flask import Flask,render_template,session,request,send_from_directory,jsonify
-from App.views import blue_root
+from flask import Flask
+import secrets
+'''
+引入需要注册的蓝图变量
+'''
+from App.views import blue_root, blue_user, blue_infer, blue_test
 
 def create_app():
     '''
@@ -31,6 +30,20 @@ def create_app():
 
     # 注册蓝图
     app.register_blueprint(blueprint=blue_root)
+    app.register_blueprint(blueprint=blue_user,url_prefix="/user")
+    app.register_blueprint(blueprint=blue_infer,url_prefix="/infer")
+    # app.register_blueprint(blueprint=blue_test)
+
+    # 设置上传、推理和裁剪文件的保存位置
+    UPLOAD_IMAGE_FOLDER = './sources/upload_image/'
+    INFER_IMAGE_FOLDER = './sources/infer_image/'
+    CROP_IMAGE_FOLDER = './sources/crop_image/'
+    app.config['UPLOAD_IMAGE_FOLDER'] = UPLOAD_IMAGE_FOLDER
+    app.config['INFER_IMAGE_FOLDER'] = INFER_IMAGE_FOLDER
+    app.config['CROP_IMAGE_FOLDER'] = CROP_IMAGE_FOLDER
+
+    # 设置密钥，用长度为16的十六进制随机字符串作为密钥
+    app.secret_key = secrets.token_hex(16)
 
     # 返回应用
     return app
