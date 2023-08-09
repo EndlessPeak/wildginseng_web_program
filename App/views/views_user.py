@@ -1,7 +1,8 @@
 '''
-在本文件中写入路由和视图函数
+在本文件中写入普通用户的路由和视图函数
 1.使用蓝图进行路由注册，取代 app.route
 2.建议一个蓝图变量绑定一组目的相同的路由
+3.本文件使用 user 作为普通用户的蓝图路由
 '''
 
 '''
@@ -16,22 +17,22 @@
 '''
 from flask import Blueprint, request, send_from_directory, \
     current_app,render_template , session, jsonify, redirect, url_for
-# from App.models import *
+from App.models.models_user import User
 
 '''
 配置蓝图
 __name__ 参数指代应用
 '''
-blue_root = Blueprint('root',__name__)
 blue_user = Blueprint('user',__name__)
-blue_infer = Blueprint('infer',__name__)
+
+
 # 用于测试的蓝图路由，不在app中注册蓝图
 blue_test = Blueprint('test',__name__)
 
 '''
 登录路由
 '''
-@blue_root.route('/login')
+@blue_user.route('/login')
 def user_login():
     return "Login page."
 
@@ -41,7 +42,7 @@ def check_login_status():
     return True
 
 # 请求前钩子函数，判断用户登录状态
-@blue_root.before_request
+@blue_user.before_request
 def check_login_route():
     # print(request.endpoint)
     if request.endpoint != "root.user_login" and not check_login_status():
@@ -51,7 +52,7 @@ def check_login_route():
 '''
 根路由，以及相关的路由
 '''
-@blue_root.route('/')
+@blue_user.route('/')
 def index():
     return "Hello World."
 
@@ -59,15 +60,15 @@ def index():
 用于获取上传文件的路由
 path    接收路径，可包含斜线
 '''
-@blue_infer.route('/request_upload_image/<path:filename>')
+@blue_user.route('/request_upload_image/<path:filename>')
 def serve_upload_image(filename):
     return send_from_directory(current_app.config['UPLOAD_IMAGE_FOLDER'],filename)
 
-@blue_infer.route('/request_infer_image/<path:filename>')
+@blue_user.route('/request_infer_image/<path:filename>')
 def serve_infer_image(filename):
     return send_from_directory(current_app.config['INFER_IMAGE_FOLDER'],filename)
 
-@blue_infer.route('/request_crop_image/<path:filename>')
+@blue_user.route('/request_crop_image/<path:filename>')
 def serve_crop_image(filename):
     return send_from_directory(current_app.config['CROP_IMAGE_FOLDER'],filename)
 
@@ -91,16 +92,16 @@ def get_string(username):
 
 @blue_test.route('/request/', methods=['GET', 'POST'])
 def get_request():
-    print(request.method)   #请求方式
-    print(request.args)     #若为GET请求，则使用args获取参数内容，获取的是类字典对象
-    print(request.form)     #若为POST请求，则使用form获取参数内容，获取的也是类字典对象
-    print(request.path)     #显示路由
-    print(request.cookies)  #cookies
-    print(request.url)      #完整url
-    print(request.base_url) #路由url
-    print(request.host_url) #基本url
-    print(request.remote_addr) #客户端IP
-    print(request.files)    #文件上传
-    print(request.headers)  #请求头
-    print(request.user_agent) #用户代理，包含浏览器信息和操作系统信息
+    print(request.method)       #请求方式
+    print(request.args)         #若为GET请求，则使用args获取参数内容，获取的是类字典对象
+    print(request.form)         #若为POST请求，则使用form获取参数内容，获取的也是类字典对象
+    print(request.path)         #显示路由
+    print(request.cookies)      #cookies
+    print(request.url)          #完整url
+    print(request.base_url)     #路由url
+    print(request.host_url)     #基本url
+    print(request.remote_addr)  #客户端IP
+    print(request.files)        #文件上传
+    print(request.headers)      #请求头
+    print(request.user_agent)   #用户代理，包含浏览器信息和操作系统信息
     return 'request ok!'
