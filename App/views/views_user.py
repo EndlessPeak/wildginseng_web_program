@@ -17,7 +17,7 @@
 '''
 from flask import Blueprint, request, send_from_directory, \
     current_app,render_template , session, jsonify, redirect, url_for
-from App.models.models_user import User
+from App.models.models_user import UserModel
 
 '''
 配置蓝图

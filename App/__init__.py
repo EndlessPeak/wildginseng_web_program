@@ -57,6 +57,9 @@ def create_app():
 
     '''
     配置数据库
+    1. 获取数据库配置信息
+    2. 根据配置信息初始化数据库连接地址
+    3. 配置数据库
     '''
     db_config = get_db_config()
     db_uri = 'mysql+pymysql://{}:{}@{}/{}'.format(
@@ -68,6 +71,7 @@ def create_app():
     print(db_uri)
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri          # 配置数据库网址
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False    # 禁用对象追踪修改
+    app.config['SQLALCHEMY_ECHO'] = True                    # 打印调试信息
 
     # 初始化插件
     init_extensions(app=app)
