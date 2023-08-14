@@ -21,11 +21,11 @@ class UserModel(db.Model):
     # db.String(30) 表示 varchar(30) 可变字符串；
     # unique 是不允许重复；
     # index 是索引，加快查询速度；
-    # 用户的账户名
+    # 用户的账户名与密码
     username = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(50))
     # 用户的姓名
-    name = db.Column(db.String(10))
+    name = db.Column(db.String(50))
     # 电话
     contact = db.Column(db.String(50))
     # 保留字段，备注

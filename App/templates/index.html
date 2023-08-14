@@ -48,7 +48,7 @@
 
     <div class="ws-container">
         <div class="layui-container" style="padding: 20px;">
-            <h1 style="text-align: center; margin:20px auto;">您好，{{ session.get("user") }}，欢迎使用野山参预测系统</h1>
+            <h1 style="text-align: center; margin:20px auto;">您好，{{ session.get("user_name") }}，欢迎使用野山参预测系统</h1>
             <a href="#" class="layui-btn layui-btn-primary">查看我的参</a>
             <a href="{{ url_for('user.upload_ginseng_image') }}" class="layui-btn">上传预测</a>
             <a href="#" class="layui-btn layui-btn-primary">实时预测</a>

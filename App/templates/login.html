@@ -64,7 +64,8 @@
 			</div>
 
 			<div class="layui-row">
-				<form action="test" method="POST" class="layui-form">
+				<!-- action="/login" method="POST" -->
+				<form class="layui-form" action="" lay-filter="form-group">
 					<input type="hidden" name="method" value="login">
 					<div class="layui-form-item" style="width: 400px; margin: auto;">
 						<label class="layui-form-label">用户名</label>
@@ -86,7 +87,7 @@
 					</div>
 					<div class="layui-form-item">
 						<div class="layui-input-block" style="display: flex;justify-content:center;">
-							<button class="layui-btn" lay-submit lay-filter="formDemo"
+							<button class="layui-btn" lay-submit lay-filter="form-submit"
 								style="margin-left: -80px;">立即提交</button>
 							<button type="reset" class="layui-btn layui-btn-primary">重置</button>
 							<a href="#" class="layui-btn layui-btn-primary">注册</a>
@@ -119,10 +120,51 @@
 		});
 	});
 
+	layui.use('form', function () {
+		var form = layui.form;
+		var layer = layui.layer;
+		var $ = layui.$;
+		//var util = layui.util;
+
+		// 监听表单提交事件
+		form.on('submit(form-submit)', function (data) {
+			// 发起 Ajax 请求
+			$.ajax({
+				url: '/login',  // 后端登录接口的 URL
+				type: 'POST',
+				dataType: 'json',
+				data: data.field,
+				success: function (result) {
+					// 根据返回的 JSON 数据判断是否登录成功
+					if (result.success) {
+						// 登录成功，显示成功提示框
+						layer.msg('登录成功', { icon: 1 });
+						// 1秒后进行页面重定向
+						setTimeout(function () {
+							window.location.href = '/';
+						}, 1000); // 1000毫秒 = 1秒
+						// 进行页面重定向
+						//window.location.href = '/';
+					} else {
+						// 登录失败，显示失败提示框
+						layer.msg('登录失败，请检查用户名和密码', { icon: 2 });
+					}
+				},
+				error: function () {
+					// 处理请求发生错误的情况
+					layer.msg('请求失败，请重试', { icon: 2 });
+				}
+			});
+			return false; // 阻止表单的默认提交行为
+		});
+
+	});
+
 	//Reload window when it resize
 	$(window).resize(function () {
 		window.location.reload()
 	})
+
 
 </script>
 

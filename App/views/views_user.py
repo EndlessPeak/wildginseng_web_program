@@ -32,22 +32,46 @@ blue_test = Blueprint('test',__name__)
 '''
 登录路由
 '''
-@blue_user.route('/login')
+@blue_user.route('/login',methods=['GET', 'POST'])
 def user_login():
-    return render_template("login.html")
+    if request.method == 'GET':
+        return render_template("login.html")
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        # 登录验证
+        user = UserModel.query.filter_by(username=username,password=password).first()
+        if user:
+            # 登录成功
+            response = {
+                'success': True,
+                # 'message': 'Login Successful',
+            }
+            session['user_id'] = user.id
+            session['user_name'] = user.name
+        else:
+            # 登录失败
+            response = {
+            'success': False,
+            # 'message': 'Login failed'
+        }
+        return jsonify(response)
 
 # 检查登录状态
 def check_login_status():
-    pass
-    return True
+    if 'user_id' in session:
+        return True
+    else:
+        return False
 
 # 请求前钩子函数，判断用户登录状态
 @blue_user.before_request
 def check_login_route():
+    # user.user_login 是 user 蓝图的登录路由使用的方法
     # print(request.endpoint)
-    if request.endpoint != "root.user_login" and not check_login_status():
+    if request.endpoint != "user.user_login" and not check_login_status():
         # 实际上就是 redirect("/login")
-        return redirect(url_for("root.user_login")) 
+        return redirect(url_for("user.user_login")) 
 
 '''
 根路由，以及相关的路由
