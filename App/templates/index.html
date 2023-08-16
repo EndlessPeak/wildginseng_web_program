@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>野山参等级分类系统</title>
+    <title>野山参等级分类管理系统</title>
     <link rel="stylesheet" href="static/layui/css/layui.css">
     <link rel="stylesheet" href="static/layui/css/global.css">
     <!--<link rel="stylesheet" type="text/css" href="/static/css/style.css">-->
@@ -12,57 +12,256 @@
 </head>
 
 <body>
-    <script>
-        layui.use(function () {
-            var element = layui.element;
-            element.render('nav');
-        });
-    </script>
-
     <!-- header part -->
     <div class="layui-header ws-header ws-bg-light">
         <div class="ws-logo">
-            <a href="/">野山参等级分类系统</a>
+            <img src="/static/images/logo.jpg"
+                style="transform:scale(0.3);vertical-align: top;margin-top: -12px;margin-right: -20px;">
+            <a href="/">野山参等级分类管理系统</a>
         </div>
-        <div class="ws-header-menu">
+        <div class="ws-header-menu ws-bg-light" style="position: absolute;left:240px">
+            <ul class="layui-nav layui-bg-gray ws-bg-light">
+                <!--控制左侧栏是否隐藏的按钮-->
+                <li class="layui-nav-item layui-show-xs-inline-block" lay-header-event="menuLeft">
+                    <a href="javascript:;"><i id="leftEnumIcon" class="layui-icon layui-icon-spread-left"></i></a>
+                </li>
+            </ul>
+        </div>
+        <div class="ws-header-menu ws-bg-light layui-layout-right">
             <ul class="layui-nav layui-bg-gray ws-bg-light">
                 <li class="layui-nav-item">
-                    <a href="javascript:;">子级</a>
+                    <a href="javascript:;">
+                        <img src="/static/images/avtar.jpg" class="layui-nav-img">
+                        {{ session.get("user_name") }}
+                    </a>
                     <dl class="layui-nav-child">
-                        <dd><a href="nav.html">菜单1</a></dd>
-                        <dd><a href="nav.html">菜单2</a></dd>
-                        <dd><a href="nav.html">菜单3</a></dd>
+                        <dd><a href="">基本资料</a></dd>
+                        <dd><a href="">安全设置</a></dd>
                     </dl>
                 </li>
-                <li class="layui-nav-item">
-                    <a href="javascript:;">选项</a>
-                    <dl class="layui-nav-child">
-                        <dd><a href="nav.html">选项1</a></dd>
-                        <dd class="layui-this"><a href="nav.html">选项2</a></dd>
-                        <dd><a href="nav.html">选项3</a></dd>
-                    </dl>
-                </li>
+                <li class="layui-nav-item"><a href="#">注销</a></li>
             </ul>
         </div>
     </div>
 
+    <!-- container part -->
     <div class="ws-container">
-        <div class="layui-container" style="padding: 20px;">
-            <h1 style="text-align: center; margin:20px auto;">您好，{{ session.get("user_name") }}，欢迎使用野山参预测系统</h1>
-            <a href="#" class="layui-btn layui-btn-primary">查看我的参</a>
-            <a href="{{ url_for('user.upload_ginseng_image') }}" class="layui-btn">上传预测</a>
-            <a href="#" class="layui-btn layui-btn-primary">实时预测</a>
-            <a href="#" class="layui-btn layui-btn-primary">拍照预测</a>
-            <br />
+        <div class="layui-panel ws-menu">
+            <ul class="layui-menu ws-docs-menu" id="ginseng-index-menu">
+                <li class="layui-menu-body-title" lay-options="{id: 100}">统计信息</li>
+                <li class="layui-menu-item-group layui-menu-item-down"
+                    lay-options="{type: 'group', isAllowSpread: false}">
+                    <div class="layui-menu-body-title">
+                        推理参茸
+                        <!--
+                        显示图标
+                        <i class="layui-icon layui-icon-up"></i>
+                    -->
+                    </div>
+                    <ul>
+                        <li lay-options="{id: 101}">
+                            <div class="layui-menu-body-title">上传图片推理</div>
+                        </li>
+                        <li lay-options="{id: 102}">
+                            <div class="layui-menu-body-title">实时拍照推理</div>
+                        </li>
+                    </ul>
+                </li>
+                <!--<li class="layui-menu-item-divider"></li>-->
+                <li class="layui-menu-item-group layui-menu-item-down"
+                    lay-options="{type: 'group', isAllowSpread: false}">
+                    <div class="layui-menu-body-title">
+                        管理参茸
+                        <!--
+                            显示图标
+                            <i class="layui-icon layui-icon-up"></i>
+                        -->
+                    </div>
+                    <ul>
+                        <li lay-options="{id: 103}">
+                            <div class="layui-menu-body-title">当日参茸</div>
+                        </li>
+                        <li lay-options="{id: 104}">
+                            <div class="layui-menu-body-title">历史参茸</div>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="layui-menu-item-group layui-menu-item-down"
+                    lay-options="{type: 'group', isAllowSpread: false}">
+                    <div class="layui-menu-body-title">
+                        用户设置
+                        <!--
+                            显示图标
+                            <i class="layui-icon layui-icon-up"></i>
+                        -->
+                    </div>
+                    <ul>
+                        <li lay-options="{id: 105}">
+                            <div class="layui-menu-body-title">资料设置</div>
+                        </li>
+                        <li lay-options="{id: 106}">
+                            <div class="layui-menu-body-title">注销登录</div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
+        <!--主体部分 
+        <div class="ws-content" style="margin-right: 0px; min-height: 85vh;">
+            <iframe id="index-page-main-part" src="/statistics"
+                style="position: absolute;top: 0;left: 0;width:100%;height:85vh;border:none;"></iframe>
+        </div>-->
+        <div class="layui-body" style="left: 240px;width: calc(100% - 240px);">
+            <iframe id="index-page-main-part" src="/statistics"
+                style="position: absolute;top: 0;left: 0;width:100%;height:85vh;border:none;"></iframe>
+        </div>
+
     </div>
 
+
+    <!--缩放页面时显示的工具按钮-->
+    <div class="ws-menu-bar layui-bg-green layui-hide" lay-on="simiMenuLeft">
+        <a href="javascript:;"><i class="layui-icon layui-icon-spread-left"></i></a>
+    </div>
     <div class="layui-footer ws-footer">
-        <p>
-            Copyright©2023
+        <p style="line-height: 20px;">
+            Copyright © 2023
+            <a href="/index">野山参等级分类管理系统</a>
+            AGPL V3 Licensed
             开发单位: 延边大学嵌入式系统实验室
         </p>
     </div>
 </body>
+
+<script>
+    //layui主体，监听菜单点击事件
+    layui.use(function () {
+        var dropdown = layui.dropdown;
+        var layer = layui.layer;
+        var util = layui.util;
+        var $ = layui.jquery;
+        // 菜单点击事件
+        dropdown.on('click(ginseng-index-menu)', function (options) {
+            //console.log(this, options);
+            var menuId = options.id;
+            var menuTitle = options.title;
+
+            // 根据菜单项的数据进行重定向
+            // 显示
+            //layer.msg(util.escape(JSON.stringify(options)));
+            layer.msg(menuId);
+            if (menuId == 100) {
+                //window.location.href = '/upload_ginseng_image'; // 将页面重定向到page1.html
+                $('#index-page-main-part').attr('src', '/statistics')
+            } else if (menuId == 101) {
+                $('#index-page-main-part').attr('src', '/upload_ginseng_image')
+            } else if (menuId == 102) {
+                $('#index-page-main-part').attr('src', '/upload_ginseng_image')
+            } else if (menuId == 103) {
+                $('#index-page-main-part').attr('src', '/upload_ginseng_image')
+            } else if (menuId == 104) {
+                $('#index-page-main-part').attr('src', '/upload_ginseng_image')
+            } else if (menuId == 105) {
+                $('#index-page-main-part').attr('src', '/upload_ginseng_image')
+            } else if (menuId == 106) {
+                //注销
+                window.location.href = '/logout'; // 将页面重定向到登出路由
+            }
+
+        });
+    });
+
+    //layui主体，监听菜单栏展开与隐藏事件以及小窗口弹出与隐藏菜单事件
+    layui.use(['layer', 'util'], function () {
+        var layer = layui.layer;
+        var util = layui.util;
+        var $ = layui.$;
+        //菜单栏展开与隐藏事件
+        util.event('lay-header-event', {
+            menuLeft: function (othis) {
+                //element.collapse('test', false);
+                var btn = $("#leftEnumIcon");
+                if (btn.hasClass('layui-icon-spread-left')) {
+                    // 左侧菜单事件
+                    //layer.msg('导航菜单折叠', { icon: 1 });
+                    menuHide(btn);
+                    btn.addClass('btn-index');
+                } else if (btn.has('layui-icon-shrink-right')) {
+                    // 左侧菜单事件
+                    //layer.msg('导航菜单展开', { icon: 1 });
+                    btn.removeClass('btn-index');
+                    menuShow(btn);
+                }
+            },
+        });
+        //小窗口弹出与隐藏菜单事件
+        util.on('lay-on', {
+            'simiMenuLeft': function () {
+                // 使用 layer.open 方法打开一个弹出层
+                layer.open({
+                    type: 1,
+                    offset: 'l',
+                    anim: 'slideRight', // 从左往右
+                    area: ['240px', '100%'],
+                    title: false,
+                    closeBtn: true,  // 不显示关闭按钮
+                    shade: 0,       // 背景遮罩透明度
+                    //shadeClose: true, // 点击遮罩层关闭弹出层
+                    id: 'left-index-menu',
+                    content: $('.layui-menu'),  // 弹出层内容为类名为 ws-menu 的元素
+                });
+            },
+        });
+
+        /*
+        $(window).resize(function () {
+            var width = $(document.body).width();
+            var btn = $("#leftEnumIcon");
+            if (width < 1000) {
+                if (btn.hasClass('layui-icon-spread-left')) {
+                    menuShow(btn);
+                }
+            } else {
+                if (!btn.hasClass('btn-index')) {
+                    if (btn.hasClass('layui-icon-shrink-right')) {
+                        menuHide(btn);
+                    }
+                }
+            }
+        });
+        */
+        function menuShow(btn) {
+            btn.removeClass('layui-icon-shrink-right').addClass('layui-icon-spread-left');
+            $(".layui-panel").css({ width: 'toggle' });
+            $(".zq-logo").css({ width: 'toggle' });
+            var bodyWidth = $(window).width() - 240;
+            $(".layui-body").css({ left: '240px', width: bodyWidth + 'px' });
+            $(".layui-footer").css({ left: '200px' });
+        }
+
+        function menuHide(btn) {
+            btn.removeClass(' layui-icon-spread-left').addClass('layui-icon-shrink-right');
+            $(".layui-panel").css({ width: 'toggle' }); //toggle如果原来div是隐藏的就会把元素显示，如果原来是显示则隐藏
+            $(".zq-logo").css({ width: 'toggle' });
+            $(".layui-body").css({ left: '0px', width: '100%' });
+            $(".layui-footer").css({ left: '0px' });
+        }
+    });
+
+    //加载对应菜单项
+    layui.use(['code', 'element', 'jquery'], function () {
+        var $ = layui.jquery;
+        $(".layui-menu-body-title").each(function (index, elm) {
+            var url = window.location.pathname;
+            var href = $(elm).children('a').attr('href');
+            if (url.indexOf(href) !== -1) {
+                $(elm).parent('li').addClass('layui-menu-item-checked2');
+            }
+        });
+    })
+
+
+</script>
 
 </html>

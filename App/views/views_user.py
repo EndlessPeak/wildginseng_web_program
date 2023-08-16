@@ -26,7 +26,7 @@ __name__ 参数指代应用
 blue_user = Blueprint('user',__name__)
 
 
-# 用于测试的蓝图路由，不在app中注册蓝图
+# 用于测试的蓝图路由，发布时不在app中注册蓝图
 blue_test = Blueprint('test',__name__)
 
 '''
@@ -34,12 +34,13 @@ blue_test = Blueprint('test',__name__)
 '''
 @blue_user.route('/login',methods=['GET', 'POST'])
 def user_login():
+    # 直接访问登录页面
     if request.method == 'GET':
         return render_template("login.html")
+    # 登录验证
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        # 登录验证
         user = UserModel.query.filter_by(username=username,password=password).first()
         if user:
             # 登录成功
@@ -59,7 +60,7 @@ def user_login():
 
 # 检查登录状态
 def check_login_status():
-    if 'user_id' in session:
+    if 'user_id' in session and 'user_name' in session:
         return True
     else:
         return False
@@ -77,11 +78,22 @@ def check_login_route():
 根路由，以及相关的路由
 '''
 @blue_user.route('/')
+@blue_user.route('/index')
 def index():
+    # 在 index.html 中根据 session 获取用户的信息
     return render_template("index.html")
 
 '''
-用于获取上传文件的路由
+统计路由，获取相关的统计数据
+'''
+@blue_user.route('/statistics')
+def statistics():
+    return render_template("statistics.html")
+
+'''
+获取上传图片文件的服务路由
+目的：将上传的图片保存到指定位置
+参数：
 path    接收路径，可包含斜线
 '''
 @blue_user.route('/request_upload_image/<path:filename>')
@@ -96,9 +108,18 @@ def serve_infer_image(filename):
 def serve_crop_image(filename):
     return send_from_directory(current_app.config['CROP_IMAGE_FOLDER'],filename)
 
+'''
+上传图片的页面及相应的路由
+目的：渲染页面，要求用户上传
+备注：该路由可以调用上面的服务路由
+'''
 @blue_user.route('/upload_ginseng_image', methods=['GET', 'POST'])
 def upload_ginseng_image():
-    return "upload_image"
+    return render_template('upload_ginseng_image.html')
+
+'''
+以下为测试路由
+'''
 
 '''
 可接收的路由参数
@@ -113,6 +134,13 @@ def upload_ginseng_image():
 请求方式默认支持 GET/HEAD/OPTIONS
 能够手动指定的请求包括 GET/POST/HEAD/PUT/DELETE
 '''
+@blue_test.route('/')
+def display_test_page():
+    # 对于 test 路由，注册蓝图时 url_prefix="/test"
+    # 因此所有静态资源加载时必须指明通过根路由加载
+    # 否则静态资源默认会从 /test 下加载
+    return render_template('test.html')
+
 @blue_test.route('/test/<string:username>')
 def get_string(username):
     print(username)

@@ -14,7 +14,7 @@ import json
 '''
 引入需要注册的蓝图变量
 '''
-from App.views.views_user import blue_user # blue_test
+from App.views.views_user import blue_user,blue_test
 from App.views.views_admin import blue_admin
 from App.extensions import init_extensions
 
@@ -42,7 +42,7 @@ def create_app():
     # 注册蓝图
     app.register_blueprint(blueprint=blue_user)
     app.register_blueprint(blueprint=blue_admin,url_prefix="/admin")
-    # app.register_blueprint(blueprint=blue_test)
+    app.register_blueprint(blueprint=blue_test,url_prefix="/test")
 
     # 设置上传、推理和裁剪文件的保存位置
     UPLOAD_IMAGE_FOLDER = './sources/upload_image/'
