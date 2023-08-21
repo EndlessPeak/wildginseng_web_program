@@ -11,6 +11,7 @@
 from flask import Flask 
 import secrets
 import json
+import os
 '''
 引入需要注册的蓝图变量
 '''
@@ -44,10 +45,22 @@ def create_app():
     app.register_blueprint(blueprint=blue_admin,url_prefix="/admin")
     app.register_blueprint(blueprint=blue_test,url_prefix="/test")
 
+    '''
+    配置项目的真正项目根目录，原因见下面的说明
+    '''
+    app.config['PROJECT_ROOT'] = os.path.dirname(app.root_path)
+
     # 设置上传、推理和裁剪文件的保存位置
-    UPLOAD_IMAGE_FOLDER = './sources/upload_image/'
-    INFER_IMAGE_FOLDER = './sources/infer_image/'
-    CROP_IMAGE_FOLDER = './sources/crop_image/'
+    '''
+    注意：
+    执行 app.py 时，所有的路径都是相对项目根目录的
+    但是对于 flask app 项目来说，所有的路径都是相对 App 目录的
+    因此下面配置的路径只能用于一般的业务代码
+    在遇到 send_from_directory 时，需要取 current_app.root_path 的父级目录
+    '''
+    UPLOAD_IMAGE_FOLDER = './App/sources/upload_image/'
+    INFER_IMAGE_FOLDER = './App/sources/infer_image/'
+    CROP_IMAGE_FOLDER = './App/sources/crop_image/'
     app.config['UPLOAD_IMAGE_FOLDER'] = UPLOAD_IMAGE_FOLDER
     app.config['INFER_IMAGE_FOLDER'] = INFER_IMAGE_FOLDER
     app.config['CROP_IMAGE_FOLDER'] = CROP_IMAGE_FOLDER

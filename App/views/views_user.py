@@ -19,12 +19,16 @@ from flask import Blueprint, request, send_from_directory, \
     current_app, render_template, session, jsonify, redirect, url_for
 from App.models.models_user import UserModel
 
+from utils.crop_image import crop_ginseng_image_backend
+import os
+import uuid
+import hashlib
+
 '''
 配置蓝图
 __name__ 参数指代应用
 '''
 blue_user = Blueprint('user',__name__)
-
 
 # 用于测试的蓝图路由，发布时不在app中注册蓝图
 blue_test = Blueprint('test',__name__)
@@ -95,18 +99,23 @@ def statistics():
 目的：将上传的图片保存到指定位置
 参数：
 path    接收路径，可包含斜线
+注意：
+路径这样编写的原因见 __init__.py 中有关 app.config 部分的说明
 '''
-@blue_user.route('/request_upload_image/<path:filename>')
-def serve_upload_image(filename):
-    return send_from_directory(current_app.config['UPLOAD_IMAGE_FOLDER'],filename)
+@blue_user.route('/request_upload_image/<path:file_name>')
+def serve_upload_image(file_name):
+    upload_path = os.path.join(current_app.config['PROJECT_ROOT'],current_app.config['UPLOAD_IMAGE_FOLDER'])
+    return send_from_directory(upload_path,file_name)
 
-@blue_user.route('/request_infer_image/<path:filename>')
-def serve_infer_image(filename):
-    return send_from_directory(current_app.config['INFER_IMAGE_FOLDER'],filename)
+@blue_user.route('/request_infer_image/<path:file_name>')
+def serve_infer_image(file_name):
+    infer_path = os.path.join(current_app.config['PROJECT_ROOT'],current_app.config['INFER_IMAGE_FOLDER'])
+    return send_from_directory(infer_path,file_name)
 
-@blue_user.route('/request_crop_image/<path:filename>')
-def serve_crop_image(filename):
-    return send_from_directory(current_app.config['CROP_IMAGE_FOLDER'],filename)
+@blue_user.route('/request_crop_image/<path:file_name>')
+def serve_crop_image(file_name):
+    crop_path = os.path.join(current_app.config['PROJECT_ROOT'],current_app.config['CROP_IMAGE_FOLDER'])
+    return send_from_directory(crop_path,file_name)
 
 '''
 上传图片的页面及相应的路由
@@ -115,7 +124,72 @@ def serve_crop_image(filename):
 '''
 @blue_user.route('/upload_ginseng_image', methods=['GET', 'POST'])
 def upload_ginseng_image():
-    return render_template('upload_ginseng_image.html')
+    if request.method == 'GET':
+        return render_template('upload_ginseng_image.html')
+    '''
+    POST 请求负责处理保存图片到指定路径的业务逻辑
+    '''
+
+    # 对图片文件进行哈希运算，生成uuid 
+    f = request.files['file']
+    print(request.files)
+    # 注意流形式必须被解码成字符形式
+    file_content = f.stream.read()
+    file_hash = hashlib.sha1(file_content).hexdigest()
+    file_id = str(uuid.uuid5(uuid.NAMESPACE_DNS,file_hash))
+    print(file_id)
+
+    # 得到文件名
+    file_name = file_id +'.jpg'
+    file_path = os.path.join(current_app.config['UPLOAD_IMAGE_FOLDER'], file_name)
+
+    # 确认文件目录路径存在，若不存在则创建
+    os.makedirs(os.path.dirname(file_path),exist_ok=True)
+    print("保存路径为：",file_path)
+
+    # 流处理结束后在文件尾，现在移到文件首，以保存文件
+    f.stream.seek(0)
+    f.save(file_path)
+
+    response = {
+        "code": 0,
+        "msg": "上传成功",
+        "data": {
+            "file_name": file_name,
+            "file_url": '/request_upload_image/' + file_name
+        }
+    }
+
+    return jsonify(response)
+
+'''
+裁剪图片的路由
+目的：裁剪页面，从上传页面调用
+备注：该路由可以调用上面的服务路由
+'''
+@blue_user.route('/crop_ginseng_image', methods=['GET', 'POST'])
+def crop_ginseng_image():
+    file_name = request.form.get('file_name')
+    print("file_name:",file_name)
+
+    # 设置输入和输出路径
+    input_dir = current_app.config['UPLOAD_IMAGE_FOLDER'] + file_name
+    output_dir = current_app.config['CROP_IMAGE_FOLDER'] + file_name
+
+    # 检查文件是否存在
+    if not os.path.exists(output_dir):
+        crop_ginseng_image_backend(input_dir=input_dir,output_dir=output_dir)
+
+    # 裁剪完成后向前端发回执
+    response = {
+        "code": 0,
+        "msg": "裁剪成功",
+        "data": {
+            "file_url": '/request_crop_image/' + file_name
+        }
+    }
+
+    return jsonify(response)
 
 '''
 以下为测试路由

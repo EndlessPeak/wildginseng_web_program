@@ -11,48 +11,7 @@
 </head>
 
 <body>
-    <script>
-        layui.use(function () {
-            var element = layui.element;
-            element.render('nav');
-        });
-    </script>
-
-    <!-- header part -->
-    <div class="layui-header ws-header ws-bg-light">
-        <div class="ws-logo">
-            <a href="/">野山参等级分类系统</a>
-        </div>
-        <div class="ws-header-menu">
-            <ul class="layui-nav layui-bg-gray ws-bg-light">
-                <li class="layui-nav-item">
-                    <a href="javascript:;">子级</a>
-                    <dl class="layui-nav-child">
-                        <dd><a href="nav.html">菜单1</a></dd>
-                        <dd><a href="nav.html">菜单2</a></dd>
-                        <dd><a href="nav.html">菜单3</a></dd>
-                    </dl>
-                </li>
-                <li class="layui-nav-item">
-                    <a href="javascript:;">选项</a>
-                    <dl class="layui-nav-child">
-                        <dd><a href="nav.html">选项1</a></dd>
-                        <dd class="layui-this"><a href="nav.html">选项2</a></dd>
-                        <dd><a href="nav.html">选项3</a></dd>
-                    </dl>
-                </li>
-            </ul>
-        </div>
-    </div>
-
     <div class="ws-container">
-        <div class="layui-container" style="padding: 20px;display: none;">
-            <form action="/upload_image" method="POST" enctype="multipart/form-data">
-                <input type="file" name="file" />
-                <input type="submit" value="提交" class="layui-btn" />
-            </form>
-        </div>
-
         <div class="layui-container">
             <fieldset class="layui-elem-field" style="margin: 20px 20px;">
                 <legend>上传与裁剪</legend>
@@ -106,11 +65,11 @@
                 // 渲染
                 upload.render({
                     elem: '#ID-upload-image-drag',
-                    url: '/upload_image',
+                    url: '/upload_ginseng_image',
                     done: function (res) {
                         layer.msg('上传成功');
                         $('#ID-upload-image-preview').removeClass('layui-hide')
-                            .find('img').attr('src', res.data.fileUrl);
+                            .find('img').attr('src', res.data.file_url);
                         console.log(res)
 
                         // 移除按钮的禁用状态
@@ -118,15 +77,15 @@
 
                         // 发送请求到另一个后端接口
                         $.ajax({
-                            url: '/crop_image',
+                            url: '/crop_ginseng_image',
                             type: 'POST', // 根据实际情况选择请求类型
                             data: {
-
+                                "file_name": res.data.file_name
                             },
                             success: function (response) {
                                 // 解析响应
                                 $('#ID-crop-image-preview').removeClass('layui-hide')
-                                    .find('img').attr('src', response.data.fileUrl);
+                                    .find('img').attr('src', response.data.file_url);
                                 console.log(response);
                             },
                             error: function (error) {

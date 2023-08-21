@@ -158,13 +158,12 @@
 			return false; // 阻止表单的默认提交行为
 		});
 
+		//Reload window when it resize
+		$(window).resize(function () {
+			window.location.reload()
+		});
+
 	});
-
-	//Reload window when it resize
-	$(window).resize(function () {
-		window.location.reload()
-	})
-
 
 </script>
 
