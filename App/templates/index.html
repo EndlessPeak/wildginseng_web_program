@@ -39,7 +39,7 @@
                         <dd><a href="">安全设置</a></dd>
                     </dl>
                 </li>
-                <li class="layui-nav-item"><a href="#">注销</a></li>
+                <li class="layui-nav-item"><a href="/logout">注销</a></li>
             </ul>
         </div>
     </div>
@@ -63,7 +63,13 @@
                             <div class="layui-menu-body-title">上传图片推理</div>
                         </li>
                         <li lay-options="{id: 102}">
-                            <div class="layui-menu-body-title">实时拍照推理</div>
+                            <div class="layui-menu-body-title">手动拍照推理</div>
+                        </li>
+                        <li lay-options="{id: 103}">
+                            <div class="layui-menu-body-title">自动拍照推理</div>
+                        </li>
+                        <li lay-options="{id: 104}">
+                            <div class="layui-menu-body-title">摄像参数设置</div>
                         </li>
                     </ul>
                 </li>
@@ -78,10 +84,10 @@
                         -->
                     </div>
                     <ul>
-                        <li lay-options="{id: 103}">
+                        <li lay-options="{id: 110}">
                             <div class="layui-menu-body-title">当日参茸</div>
                         </li>
-                        <li lay-options="{id: 104}">
+                        <li lay-options="{id: 111}">
                             <div class="layui-menu-body-title">历史参茸</div>
                         </li>
                     </ul>
@@ -97,10 +103,10 @@
                         -->
                     </div>
                     <ul>
-                        <li lay-options="{id: 105}">
+                        <li lay-options="{id: 120}">
                             <div class="layui-menu-body-title">资料设置</div>
                         </li>
-                        <li lay-options="{id: 106}">
+                        <li lay-options="{id: 121}">
                             <div class="layui-menu-body-title">注销登录</div>
                         </li>
                     </ul>
@@ -151,13 +157,32 @@
             // 显示
             //layer.msg(util.escape(JSON.stringify(options)));
             layer.msg(menuId);
+            switch (menuId) {
+                //推理参茸
+                case 100:
+                    $('#index-page-main-part').attr('src', '/statistics');
+                case 101:
+                    $('#index-page-main-part').attr('src', '/upload_ginseng_image');
+                case 102:
+                    $('#index-page-main-part').attr('src', '/camera_ginseng_image');
+                //case 103:
+                //    ;
+                case 104:
+                    $('#index-page-main-part').attr('src', '/camera_settings');
+                //管理参茸
+                //用户管理
+                case 121:
+                    //注销
+                    window.location.href = '/logout'; // 将页面重定向到登出路由
+            }
+            /*
             if (menuId == 100) {
                 //window.location.href = '/upload_ginseng_image'; // 将页面重定向到page1.html
                 $('#index-page-main-part').attr('src', '/statistics')
             } else if (menuId == 101) {
                 $('#index-page-main-part').attr('src', '/upload_ginseng_image')
             } else if (menuId == 102) {
-                $('#index-page-main-part').attr('src', '/upload_ginseng_image')
+                $('#index-page-main-part').attr('src', '/camera_ginseng_image')
             } else if (menuId == 103) {
                 $('#index-page-main-part').attr('src', '/upload_ginseng_image')
             } else if (menuId == 104) {
@@ -168,6 +193,7 @@
                 //注销
                 window.location.href = '/logout'; // 将页面重定向到登出路由
             }
+            */
 
         });
     });

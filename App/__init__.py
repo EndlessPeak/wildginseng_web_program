@@ -23,7 +23,7 @@ def get_db_config():
     '''
     该函数用于获取配置文件的内容
     '''
-    with open('App/static/config.json','r') as file:
+    with open('App/static/db_config.json','r') as file:
         config = json.load(file)
     return config
 

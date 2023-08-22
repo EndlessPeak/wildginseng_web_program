@@ -11,15 +11,21 @@
 2. request              请求上下文，封装HTTP请求中的内容
 3. send_from_directory  从指定目录发送文件响应到客户端
 4. current_app          应用上下文，指代当前应用的应用实例
-5. render_template      
+5. render_template      渲染模板页面
 6. session              请求上下文，用户会话，存储请求间需要记住的值
-7. jsonify              用于json数据序列化，将数据对象变成json字符串  
+7. jsonify              用于json数据序列化，将数据对象变成json字符串
+8. redirect             重定向页面
+9. url_for              反向定位，根据视图函数定位路由
+10.Response             请求上下文，响应
 '''
 from flask import Blueprint, request, send_from_directory, \
-    current_app, render_template, session, jsonify, redirect, url_for
+    current_app, render_template, session, jsonify, redirect, \
+    url_for, Response
 from App.models.models_user import UserModel
 
 from utils.crop_image import crop_ginseng_image_backend
+from utils.capture_camera import camera_ginseng_frames
+
 import os
 import uuid
 import hashlib
@@ -77,6 +83,18 @@ def check_login_route():
     if request.endpoint != "user.user_login" and not check_login_status():
         # 实际上就是 redirect("/login")
         return redirect(url_for("user.user_login")) 
+
+'''
+注销的路由
+'''
+@blue_user.route('/logout',methods=['GET','POST'])
+def logout():
+    # 运行事务前钩子函数
+    # 包括关灯，保存配置到json文件等内容
+
+    # 注销逻辑，清空 session
+    session.clear()
+    return redirect(url_for("user.user_login"))
 
 '''
 根路由，以及相关的路由
@@ -190,6 +208,20 @@ def crop_ginseng_image():
     }
 
     return jsonify(response)
+
+'''
+生成视频流的响应路由
+'''
+@blue_user.route('/camera_ginseng_stream')
+def camera_ginseng_stream():
+    return Response(camera_ginseng_frames(),mimetype='multipart/x-mixed-replace; boundary=frame')
+
+'''
+渲染拍照推理页面的路由
+'''
+@blue_user.route('/camera_ginseng_image', methods=['GET', 'POST'])
+def camera_ginseng_image():
+    return render_template('camera_ginseng_image.html')
 
 '''
 以下为测试路由
