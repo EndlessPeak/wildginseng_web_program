@@ -59,6 +59,7 @@
         var util = layui.util;
         var upload = layui.upload;
         var $ = layui.$;
+        var process_file_name;
         // 渲染
         upload.render({
             elem: '#ID-upload-image-drag',
@@ -67,8 +68,8 @@
                 layer.msg('上传成功');
                 $('#ID-upload-image-preview').removeClass('layui-hide')
                     .find('img').attr('src', res.data.file_url);
-                console.log(res)
-
+                console.log(res);
+                process_file_name = res.data.file_name;
                 // 移除按钮的禁用状态
                 $('#ID-infer-button').removeClass('layui-btn-disabled');
 
@@ -77,7 +78,7 @@
                     url: '/crop_ginseng_image',
                     type: 'POST', // 根据实际情况选择请求类型
                     data: {
-                        "file_name": res.data.file_name
+                        "file_name": process_file_name //res.data.file_name
                     },
                     success: function (response) {
                         // 解析响应
@@ -95,13 +96,28 @@
             }
         });
 
+        //推理
         util.on('lay-on', {
             'show-load-4': function () {
                 if ($('#ID-infer-button').hasClass('layui-btn-disabled')) return;
+                $.ajax({
+                    url: '/infer_ginseng_image',
+                    type: 'POST', // 根据实际情况选择请求类型
+                    data: {
+                        "file_name": process_file_name //res.data.file_name
+                    },
+                    success: function (response) {
+                        console.log(response);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+                
                 // 按钮禁用时不执行下面的逻辑
                 layer.msg('开始进行推理，请勿刷新页面！', { icon: 0 }, function () {
                     //回调
-                    layer.msg('执行推理大约需要5-10s时间，请耐心等待。请勿刷新页面！', {
+                    layer.msg('执行推理大约需要1-10s时间，请耐心等待。请勿刷新页面！', {
                         icon: 16,
                         shade: 0.05
                     });
@@ -110,15 +126,15 @@
                 // 模拟关闭
                 setTimeout(function () {
                     layer.close(loadIndex)
-                }, 5000);
+                }, 1000);  
             }
         })
 
         // 监听按钮点击事件
-        $('#ID-infer-button').click(function () {
-            if ($(this).hasClass('layui-btn-disabled')) return; // 按钮禁用时不执行下面的逻辑
-            window.location.href = "/infer_image";
-        });
+        // $('#ID-infer-button').click(function () {
+        //     if ($(this).hasClass('layui-btn-disabled')) return; // 按钮禁用时不执行下面的逻辑
+        //     window.location.href = "/infer_image";
+        // });
     });
 </script>
 

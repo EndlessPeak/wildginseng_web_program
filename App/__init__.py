@@ -81,7 +81,7 @@ def create_app():
         db_config['host'],
         db_config['database']
     )
-    print(db_uri)
+    # print(db_uri)
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri          # 配置数据库网址
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False    # 禁用对象追踪修改
     app.config['SQLALCHEMY_ECHO'] = True                    # 打印调试信息

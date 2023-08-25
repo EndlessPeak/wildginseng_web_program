@@ -23,8 +23,10 @@ from flask import Blueprint, request, send_from_directory, \
     url_for, Response
 from App.models.models_user import UserModel
 
-from utils.crop_image import crop_ginseng_image_backend
-from utils.capture_camera import camera_ginseng_frames
+from App.utils.crop_image import crop_ginseng_image_backend
+from App.utils.capture_camera import camera_ginseng_frames
+
+import App.utils.shared_vars # 语义上的全局变量
 
 import os
 import uuid
@@ -212,9 +214,43 @@ def crop_ginseng_image():
 '''
 生成视频流的响应路由
 '''
-@blue_user.route('/camera_ginseng_stream')
+@blue_user.route('/camera_ginseng_stream', methods=['GET', 'POST'])
 def camera_ginseng_stream():
-    return Response(camera_ginseng_frames(),mimetype='multipart/x-mixed-replace; boundary=frame')
+    if request.method == 'GET':
+        return Response(camera_ginseng_frames(),mimetype='multipart/x-mixed-replace; boundary=frame')
+
+    if request.method == 'POST':
+        if(request.form.get('capture') == 'true'):
+            App.utils.shared_vars.capture = True
+        
+        while True:
+            if(App.utils.shared_vars.save_finished):
+                App.utils.shared_vars.save_finished = False
+                break
+
+        file_name = App.utils.shared_vars.file_name
+        print(file_name)
+        
+        # 裁剪
+        # 设置输入和输出路径
+        input_dir = current_app.config['UPLOAD_IMAGE_FOLDER'] + file_name
+        output_dir = current_app.config['CROP_IMAGE_FOLDER'] + file_name
+
+        # 检查文件是否存在
+        if not os.path.exists(output_dir):
+            crop_ginseng_image_backend(input_dir=input_dir,output_dir=output_dir,s_height=0.1,e_height=1,s_col=0.1,e_col=0.9)
+
+        # 更新完成变量后向前端发回执
+        response = {
+            "code": 0,
+            "msg": "拍照&裁剪成功",
+            "data": {
+                "file_name": file_name,
+                "file_url": '/request_crop_image/' + file_name
+            }
+        }
+
+        return jsonify(response)
 
 '''
 渲染拍照推理页面的路由
@@ -222,6 +258,39 @@ def camera_ginseng_stream():
 @blue_user.route('/camera_ginseng_image', methods=['GET', 'POST'])
 def camera_ginseng_image():
     return render_template('camera_ginseng_image.html')
+
+'''
+推理图片的路由
+目的：从上传页面或拍照页面调用
+备注：该路由可以调用上面的服务路由
+'''
+@blue_user.route('/infer_ginseng_image', methods=['GET', 'POST'])
+def infer_ginseng_image():
+    file_name = request.form.get('file_name')
+    print("file_name:",file_name)
+
+    crop = True
+    # 设置输入和输出路径
+    if crop:
+        input_dir = current_app.config['CROP_IMAGE_FOLDER'] + file_name
+    else:
+        input_dir = current_app.config['UPLOAD_IMAGE_FOLDER'] + file_name
+    output_dir = current_app.config['INFER_IMAGE_FOLDER'] + file_name
+
+    if not os.path.exists(output_dir):
+        pass
+        #infer_ginseng_image_backend(input_dir,output_dir,file_name,current_app)
+    
+    # 更新完成变量后向前端发回执
+    response = {
+        "code": 0,
+        "msg": "推理成功",
+        "data": {
+            
+        }
+    }
+
+    return jsonify(response)
 
 '''
 以下为测试路由

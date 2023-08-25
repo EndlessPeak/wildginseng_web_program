@@ -150,30 +150,35 @@
         // 菜单点击事件
         dropdown.on('click(ginseng-index-menu)', function (options) {
             //console.log(this, options);
-            var menuId = options.id;
-            var menuTitle = options.title;
+            var menu_id = options.id;
+            var menu_title = options.title;
 
             // 根据菜单项的数据进行重定向
             // 显示
             //layer.msg(util.escape(JSON.stringify(options)));
-            layer.msg(menuId);
-            switch (menuId) {
+            layer.msg(menu_id);
+            switch (menu_id) {
                 //推理参茸
                 case 100:
                     $('#index-page-main-part').attr('src', '/statistics');
+                    break;
                 case 101:
                     $('#index-page-main-part').attr('src', '/upload_ginseng_image');
+                    break;
                 case 102:
                     $('#index-page-main-part').attr('src', '/camera_ginseng_image');
+                    break;
                 //case 103:
                 //    ;
                 case 104:
                     $('#index-page-main-part').attr('src', '/camera_settings');
+                    break;
                 //管理参茸
                 //用户管理
                 case 121:
                     //注销
                     window.location.href = '/logout'; // 将页面重定向到登出路由
+                    break;
             }
             /*
             if (menuId == 100) {

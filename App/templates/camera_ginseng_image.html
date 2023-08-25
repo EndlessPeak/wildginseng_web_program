@@ -21,14 +21,62 @@
         <!--左边显示视频流-->
         <div class="layui-col-md6">
             <div class="layui-upload-drag" style="display: block;">
-                <div style="display: flex;align-items: center;justify-content: center;">
+                <div class="layui-row" style="display: flex;align-items: center;justify-content: center;">
                     <i class="layui-icon layui-icon-video"></i>
-                    <span style="display: inline-block;vertical-align: middle;font-size: 20px;">摄像头数据流</span>
                 </div>
-                <img src="{{ url_for('user.camera_ginseng_stream') }}" alt="" width="100%" style="margin-bottom:10px">
-                <button id="ID-picture-button" class="layui-btn" lay-on="show-load-4">拍照</button>
-                <button id="ID-infer-button" class="layui-btn layui-btn-disabled">推理</button>
+                <span style="display: inline-block;vertical-align: middle;font-size: 20px;">摄像头数据流</span>
+                <div class="layui-row" style="justify-content: center;">
+                    <img src="{{ url_for('user.camera_ginseng_stream') }}" alt="" height="80%" width="80%" style="margin-bottom:10px;">
+                </div>
+                
             </div>
         </div>
+        <!--右边显示拍照得到的图片-->
+        <div class="layui-col-md6">
+            <div class="layui-upload-drag" style="display: block;">
+                <div class="layui-row" style="display: flex;align-items: center;justify-content: center;">
+                    <i class="layui-icon layui-icon-video"></i>       
+                </div>
+                <span style="display: inline-block;vertical-align: middle;font-size: 20px;">拍照后的图片将会在此显示</span>
+                <div id="ID-camera-image-preview" class="layui-row layui-hide" style="justify-content: center;">
+                    <img src="" alt="拍照成功后渲染" height="80%" width="80%" style="margin-bottom:10px;">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-row">
+            <button id="ID-picture-button" class="layui-btn" lay-on="take-photos">拍照</button>
+            <button id="ID-infer-button" class="layui-btn layui-btn-disabled">推理</button>
+        </div>
+        
     </div>
 </body>
+
+<script>
+    layui.use(['layer','util'],function(){
+        var layer = layui.layer;
+        var util = layui.util;
+        var $ = layui.$;
+        //当按下拍照按钮时
+        util.on('lay-on',{
+            'take-photos': function(){
+                $.ajax({
+                    url: '/camera_ginseng_stream',
+                    type: 'POST',
+                    data: {
+                        "capture": true,
+                    },
+                    // 后端的回复处理
+                    success: function(res){
+                        $('#ID-camera-image-preview').removeClass('layui-hide')
+                            .find('img').attr('src', res.data.file_url);
+                        console.log(res);
+                    },
+                    error: function(error){
+                        console.log(error);
+                    }
+                })
+            }
+        })
+    })
+</script>
