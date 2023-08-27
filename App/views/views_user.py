@@ -23,6 +23,7 @@ from flask import Blueprint, request, send_from_directory, \
     url_for, Response
 from App.models.models_user import UserModel
 
+from App.utils.infer_ginseng import infer_ginseng_image_backend
 from App.utils.crop_image import crop_ginseng_image_backend
 from App.utils.capture_camera import camera_ginseng_frames
 
@@ -31,6 +32,7 @@ import App.utils.shared_vars # 语义上的全局变量
 import os
 import uuid
 import hashlib
+import threading # 推理图片时使用多线程
 
 '''
 配置蓝图
@@ -275,18 +277,27 @@ def infer_ginseng_image():
         input_dir = current_app.config['CROP_IMAGE_FOLDER'] + file_name
     else:
         input_dir = current_app.config['UPLOAD_IMAGE_FOLDER'] + file_name
-    output_dir = current_app.config['INFER_IMAGE_FOLDER'] + file_name
+    
+    # 将文件名末尾改为 json 格式
+    json_file_name = file_name[:-4]+ ".json"
+    
+    output_dir = current_app.config['INFER_IMAGE_FOLDER'] + json_file_name
 
     if not os.path.exists(output_dir):
-        pass
-        #infer_ginseng_image_backend(input_dir,output_dir,file_name,current_app)
+        # 开启多线程执行推理
+        infer_thread = threading.Thread(target=infer_ginseng_image_backend,args=(input_dir,output_dir,current_app))
+        infer_thread.start()
+        msg = "infering"
+        #infer_ginseng_image_backend(input_dir,output_dir,current_app)
+    else:
+        msg = "infered"
     
     # 更新完成变量后向前端发回执
     response = {
         "code": 0,
-        "msg": "推理成功",
+        "msg": msg,
         "data": {
-            
+            "output_dir": output_dir,
         }
     }
 

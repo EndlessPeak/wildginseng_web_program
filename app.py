@@ -11,6 +11,6 @@ if __name__ == '__main__':
     camera_thread = threading.Thread(target=capture_camera.camera_init)
     camera_thread.start()
 
-    app.run(host=host,debug=True)
+    app.run(host=host,debug=False)
 
-    camera_thread.join()
+    # camera_thread.join()

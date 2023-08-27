@@ -18,11 +18,17 @@ def camera_init():
     global camera
     # 添加互斥锁避免潜在的线程安全问题
     with camera_lock:
+        print("start init")
         camera = cv2.VideoCapture(0)
-        width = 800
-        height = 600
+        # 初始化参数包含以下几种：
+        # 1. 无，此时启动速度最慢
+        # 2. cv2.CAP_DSHOW 启动最快
+        # 3. cv2.CAP_MSMF 启动与不带参数类似
+        width = 1920
+        height = 1080
         camera.set(cv2.CAP_PROP_FRAME_WIDTH,width)
         camera.set(cv2.CAP_PROP_FRAME_HEIGHT,height)
+        print("end init")
 
 '''
 获得本地摄像头图像字节流传输
