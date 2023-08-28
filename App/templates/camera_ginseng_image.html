@@ -24,7 +24,7 @@
                 <div class="layui-row" style="display: flex;align-items: center;justify-content: center;">
                     <i class="layui-icon layui-icon-video"></i>
                 </div>
-                <span style="display: inline-block;vertical-align: middle;font-size: 20px;">摄像头数据流</span>
+                <span style="display: inline-block;vertical-align: middle;">摄像头数据流</span>
                 <div class="layui-row" style="justify-content: center;">
                     <img src="{{ url_for('user.camera_ginseng_stream') }}" alt="" height="80%" width="80%" style="margin-bottom:10px;">
                 </div>
@@ -37,19 +37,21 @@
                 <div class="layui-row" style="display: flex;align-items: center;justify-content: center;">
                     <i class="layui-icon layui-icon-video"></i>       
                 </div>
-                <span style="display: inline-block;vertical-align: middle;font-size: 20px;">拍照后的图片将会在此显示</span>
+                <span style="display: inline-block;vertical-align: middle;">拍照后的图片将会在此显示</span>
                 <div id="ID-camera-image-preview" class="layui-row layui-hide" style="justify-content: center;">
                     <img src="" alt="拍照成功后渲染" height="80%" width="80%" style="margin-bottom:10px;">
                 </div>
             </div>
         </div>
-
-        <div class="layui-row">
-            <button id="ID-picture-button" class="layui-btn" lay-on="take-photos">拍照</button>
-            <button id="ID-infer-button" class="layui-btn layui-btn-disabled">推理</button>
-        </div>
         
     </div>
+    <div class="layui-row">
+        <div class="layui-col-md12" style="display: flex;justify-content: center;">
+            <button id="ID-picture-button" class="layui-btn" lay-on="take-photos">拍照</button>
+            <button id="ID-infer-button" class="layui-btn layui-btn-disabled" lay-on="infer-photos">推理</button>
+        </div>
+    </div>
+    
 </body>
 
 <script>
@@ -57,6 +59,7 @@
         var layer = layui.layer;
         var util = layui.util;
         var $ = layui.$;
+        var process_file_name;
         //当按下拍照按钮时
         util.on('lay-on',{
             'take-photos': function(){
@@ -68,8 +71,12 @@
                     },
                     // 后端的回复处理
                     success: function(res){
+                        // 渲染拍照的图片
                         $('#ID-camera-image-preview').removeClass('layui-hide')
                             .find('img').attr('src', res.data.file_url);
+                        // 移除按钮禁用状态
+                        $('#ID-infer-button').removeClass('layui-btn-disabled');
+                        process_file_name = res.data.file_name;
                         console.log(res);
                     },
                     error: function(error){
@@ -77,6 +84,57 @@
                     }
                 })
             }
-        })
+        });
+
+        //推理
+        util.on('lay-on', {
+            'infer-photos': function () {
+                // 按钮禁用时不执行下面的逻辑
+                if ($('#ID-infer-button').hasClass('layui-btn-disabled')) return;
+                // 单击推理后禁用推理，直到推理对话框结束
+                $('#ID-infer-button').addClass('layui-btn-disabled');
+                $.ajax({
+                    url: '/infer_ginseng_image',
+                    type: 'POST', // 根据实际情况选择请求类型
+                    data: {
+                        "file_name": process_file_name //res.data.file_name
+                    },
+                    success: function (res) {
+                        console.log(res);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+
+                layer.msg('开始进行推理，请勿刷新页面！', { icon: 0 }, function () {
+                    //回调
+                    layer.msg('执行推理大约需要10s时间，请耐心等待。请勿刷新页面！', {
+                        icon: 16,
+                        shade: 0.05
+                    },function(){
+                        //打开子窗口
+                        layer.open({
+                            type: 2,
+                            title: '推理结果',
+                            content: '/infer_ginseng_image_result',
+                            area: ['420px','350px'],
+                            maxmin: true,
+                            btn:['确定'],
+                            btnAlign: 'c',
+                            yes: function(index,layero){
+                                enable_infer_button();
+                                layer.close(index);
+                            },
+                        });
+                    });
+                });
+
+                function enable_infer_button(){
+                    //关闭弹出层窗口后取消禁用推理按钮
+                    $('#ID-infer-button').removeClass('layui-btn-disabled');
+                }
+            }
+        });
     })
 </script>

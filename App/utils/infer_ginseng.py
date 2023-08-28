@@ -69,11 +69,11 @@ def write_result(result,label_dict,output_dir,threshold=0.3):
             continue
         
         if label_dict[int(cat_id)] == 'GradeA':
-            category = "一等参"
+            category = "A"
         elif label_dict[int(cat_id)] == 'GradeB':
-            category = "二等参"
+            category = "B"
         elif label_dict[int(cat_id)] == 'DY':
-            category = "等外参"
+            category = "C"
         else:
             continue
 
@@ -88,6 +88,7 @@ def write_result(result,label_dict,output_dir,threshold=0.3):
         # 向列表添加字典
         results.append(result_info)
 
+    # 使用 utf-8 编码
     with open(output_dir,'w',encoding='utf-8') as f:
         json.dump(results,f,ensure_ascii=False,indent=4)
 
@@ -149,10 +150,10 @@ def run(predictor, img):
         results.append(output_data)
     return results
 
-def infer_ginseng_image_backend(input_dir,output_dir,current_app):
+def infer_ginseng_image_backend(input_dir,output_dir,static_folder):
     # 配置模型参数
-    model_file = current_app.static_folder + "./output_inference/ppyoloe_plus_crn_x_80e_coco/model.pdmodel"
-    params_file = current_app.static_folder + "./output_inference/ppyoloe_plus_crn_x_80e_coco/model.pdiparams"
+    model_file = static_folder + "./output_inference/ppyoloe_plus_crn_x_80e_coco/model.pdmodel"
+    params_file = static_folder + "./output_inference/ppyoloe_plus_crn_x_80e_coco/model.pdiparams"
     
     # 检查图片是否存在
     if not os.path.exists(input_dir):

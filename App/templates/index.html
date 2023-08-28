@@ -115,11 +115,11 @@
         </div>
         <!--主体部分 
         <div class="ws-content" style="margin-right: 0px; min-height: 85vh;">
-            <iframe id="index-page-main-part" src="/statistics"
+            <iframe id="index-page-main-part" src="/display_statistics"
                 style="position: absolute;top: 0;left: 0;width:100%;height:85vh;border:none;"></iframe>
         </div>-->
         <div class="layui-body" style="left: 240px;width: calc(100% - 240px);">
-            <iframe id="index-page-main-part" src="/statistics"
+            <iframe id="index-page-main-part" src="/display_statistics"
                 style="position: absolute;top: 0;left: 0;width:100%;height:85vh;border:none;"></iframe>
         </div>
 
@@ -160,7 +160,7 @@
             switch (menu_id) {
                 //推理参茸
                 case 100:
-                    $('#index-page-main-part').attr('src', '/statistics');
+                    $('#index-page-main-part').attr('src', '/display_statistics');
                     break;
                 case 101:
                     $('#index-page-main-part').attr('src', '/upload_ginseng_image');
@@ -183,7 +183,7 @@
             /*
             if (menuId == 100) {
                 //window.location.href = '/upload_ginseng_image'; // 将页面重定向到page1.html
-                $('#index-page-main-part').attr('src', '/statistics')
+                $('#index-page-main-part').attr('src', '/display_statistics')
             } else if (menuId == 101) {
                 $('#index-page-main-part').attr('src', '/upload_ginseng_image')
             } else if (menuId == 102) {

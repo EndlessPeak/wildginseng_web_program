@@ -59,7 +59,8 @@
         var util = layui.util;
         var upload = layui.upload;
         var $ = layui.$;
-        var process_file_name;
+        var process_file_name;  //仅文件名
+        var infer_file_name;    //仅文件名
         // 渲染
         upload.render({
             elem: '#ID-upload-image-drag',
@@ -84,6 +85,7 @@
                         // 解析响应
                         $('#ID-crop-image-preview').removeClass('layui-hide')
                             .find('img').attr('src', response.data.file_url);
+                        localStorage.setItem('crop_file_src',response.data.file_url);
                         console.log(response);
                     },
                     error: function (error) {
@@ -108,26 +110,49 @@
                     data: {
                         "file_name": process_file_name //res.data.file_name
                     },
-                    // success: function (response) {
-                    //     console.log(response);
-                    // },
-                    // error: function (error) {
-                    //     console.log(error);
-                    // }
+                    success: function (res) {
+                        //infer_file_name = res.data.infer_file_name;
+                        //使用本地存储保存变量，以在子窗口中使用
+                        //localStorage.setItem('infer_file_name',infer_file_name);
+                        console.log(res);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
                 });
-                
+
                 layer.msg('开始进行推理，请勿刷新页面！', { icon: 0 }, function () {
                     //回调
                     layer.msg('执行推理大约需要10s时间，请耐心等待。请勿刷新页面！', {
                         icon: 16,
                         shade: 0.05
+                    },function(){
+                        //打开子窗口
+                        layer.open({
+                            type: 2,
+                            title: '推理结果',
+                            content: '/infer_ginseng_image_result',
+                            area: ['420px','350px'],
+                            maxmin: true,
+                            btn:['确定'],
+                            btnAlign: 'c',
+                            yes: function(index,layero){
+                                enable_infer_button();
+                                layer.close(index);
+                            },
+                        });
                     });
                 });
+
+                function enable_infer_button(){
+                    //关闭弹出层窗口后取消禁用推理按钮
+                    $('#ID-infer-button').removeClass('layui-btn-disabled');
+                }
                 //var loadIndex =
                 // 模拟关闭
                 // setTimeout(function () {
                 //     layer.close(loadIndex)
-                // }, 1000);  
+                // }, 1000);
             }
         })
 

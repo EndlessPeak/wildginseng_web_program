@@ -30,6 +30,7 @@ from App.utils.capture_camera import camera_ginseng_frames
 import App.utils.shared_vars # 语义上的全局变量
 
 import os
+import json
 import uuid
 import hashlib
 import threading # 推理图片时使用多线程
@@ -112,7 +113,7 @@ def index():
 '''
 统计路由，获取相关的统计数据
 '''
-@blue_user.route('/statistics')
+@blue_user.route('/display_statistics')
 def statistics():
     return render_template("statistics.html")
 
@@ -269,7 +270,7 @@ def camera_ginseng_image():
 @blue_user.route('/infer_ginseng_image', methods=['GET', 'POST'])
 def infer_ginseng_image():
     file_name = request.form.get('file_name')
-    print("file_name:",file_name)
+    print("infer picture file_name:",file_name)
 
     crop = True
     # 设置输入和输出路径
@@ -282,10 +283,12 @@ def infer_ginseng_image():
     json_file_name = file_name[:-4]+ ".json"
     
     output_dir = current_app.config['INFER_IMAGE_FOLDER'] + json_file_name
+    print("infer json file_name:",output_dir)
 
     if not os.path.exists(output_dir):
-        # 开启多线程执行推理
-        infer_thread = threading.Thread(target=infer_ginseng_image_backend,args=(input_dir,output_dir,current_app))
+        # 开启多线程执行推理，设置其为守护线程
+        static_folder=current_app.static_folder
+        infer_thread = threading.Thread(target=infer_ginseng_image_backend,args=(input_dir,output_dir,static_folder),daemon=True)
         infer_thread.start()
         msg = "infering"
         #infer_ginseng_image_backend(input_dir,output_dir,current_app)
@@ -297,7 +300,69 @@ def infer_ginseng_image():
         "code": 0,
         "msg": msg,
         "data": {
-            "output_dir": output_dir,
+            "infer_file_name": json_file_name, # 回传仅文件名
+        }
+    }
+
+    return jsonify(response)
+
+'''
+查看推理图片结果的路由
+目的：从推理文件夹查看 json 文件内容，给出推理结果
+备注：该路由可以调用上面的服务路由
+'''
+@blue_user.route('/infer_ginseng_image_result', methods=['GET', 'POST'])
+def infer_ginseng_image_result():
+    if request.method == 'GET':
+        return render_template('infer_result.html')
+    
+    # 下面是POST请求的处理方法
+    file_name = request.form.get('file_name')
+
+    output_dir = current_app.config['INFER_IMAGE_FOLDER'] + file_name
+
+    print("infered json file_name:",file_name)
+    print("infered json dir and file_name:",output_dir)
+    
+    result = "None Result."
+
+    if os.path.exists(output_dir):
+        print("msg is succeed.")
+        msg = "succeed"
+
+        # 读取文件
+        with open(output_dir,encoding='utf-8') as file:
+            data = json.load(file)
+
+        highest_score = float(0) # 最高分首先设置为0
+        highest_category = ''
+
+        for item in data:
+            score = item['score']
+            category = item['category']
+
+            if score > highest_score:
+                highest_score = score
+                highest_category = category
+        
+        result = highest_category
+    else:
+        print("msg is failed.")
+        msg = "failed"
+    
+    if result == "A":
+        result = "一等参"
+    elif result == "B":
+        result = "二等参"
+    elif result == "C":
+        result = "等外参"
+
+    # 更新完成变量后向前端发回执
+    response = {
+        "code": 0,
+        "msg": msg,
+        "data": {
+            "result": result,
         }
     }
 

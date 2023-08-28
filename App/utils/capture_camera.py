@@ -1,5 +1,6 @@
 import os
 import cv2
+import time
 import uuid
 import hashlib
 import threading
@@ -9,7 +10,7 @@ import threading
 from App.utils import shared_vars
 
 camera = None
-camera_lock = threading.Lock()
+# camera_lock = threading.Lock()
 
 '''
 初始化摄像头，该函数在主函数中以线程方式启动，减少加载时间
@@ -17,18 +18,19 @@ camera_lock = threading.Lock()
 def camera_init():
     global camera
     # 添加互斥锁避免潜在的线程安全问题
-    with camera_lock:
-        print("start init")
-        camera = cv2.VideoCapture(0)
-        # 初始化参数包含以下几种：
-        # 1. 无，此时启动速度最慢
-        # 2. cv2.CAP_DSHOW 启动最快
-        # 3. cv2.CAP_MSMF 启动与不带参数类似
-        width = 1920
-        height = 1080
-        camera.set(cv2.CAP_PROP_FRAME_WIDTH,width)
-        camera.set(cv2.CAP_PROP_FRAME_HEIGHT,height)
-        print("end init")
+    # 在下面的函数中，互斥锁持有不释放将会导致无法退出解释器的问题，故暂时停用
+    # with camera_lock:
+    print("start init")
+    camera = cv2.VideoCapture(0,cv2.CAP_DSHOW)
+    # 初始化参数包含以下几种：
+    # 1. 无，此时启动速度最慢
+    # 2. cv2.CAP_DSHOW 启动最快
+    # 3. cv2.CAP_MSMF 启动与不带参数类似
+    width = 1024
+    height = 768
+    camera.set(cv2.CAP_PROP_FRAME_WIDTH,width)
+    camera.set(cv2.CAP_PROP_FRAME_HEIGHT,height)
+    print("end init")
 
 '''
 获得本地摄像头图像字节流传输
@@ -37,57 +39,60 @@ def camera_ginseng_frames():
     global camera
     
     while True:
-        with camera_lock:
-            ret,frame = camera.read()
-            if not ret:
-                break
-            # 把获取到的图像格式转换(编码)成流数据，赋值到内存缓存中;
-            # 主要用于图像数据格式的压缩，方便网络传输
+        if camera == None:
+            time.sleep(5)
+            continue
 
-            frame = cv2.rotate(frame,cv2.ROTATE_90_COUNTERCLOCKWISE)
+        ret,frame = camera.read()
+        if not ret:
+            break
+        # 把获取到的图像格式转换(编码)成流数据，赋值到内存缓存中;
+        # 主要用于图像数据格式的压缩，方便网络传输
 
-            ret,buffer = cv2.imencode('.jpg',frame)
-            # 如果无法将帧编码为 JPEG 格式，将会重新读取下一帧并尝试编码。
-            # 如果认为该错误严重程度高，也可以改为 break
-            if not ret:
-                continue 
-                
-            # 将缓存里的流数据转成字节流
-            image_data_bytes = buffer.tobytes()
+        frame = cv2.rotate(frame,cv2.ROTATE_90_COUNTERCLOCKWISE)
 
-            if(shared_vars.capture):
-                shared_vars.capture = False
-                print("capture flag captured!")
-                
-                # 根据 frame_bytes 内容进行哈希运算
-                file_hash = hashlib.sha1(image_data_bytes).hexdigest()
-                file_id = str(uuid.uuid5(uuid.NAMESPACE_DNS,file_hash))
+        ret,buffer = cv2.imencode('.jpg',frame)
+        # 如果无法将帧编码为 JPEG 格式，将会重新读取下一帧并尝试编码。
+        # 如果认为该错误严重程度高，也可以改为 break
+        if not ret:
+            continue 
+            
+        # 将缓存里的流数据转成字节流
+        image_data_bytes = buffer.tobytes()
 
-                # 得到文件名
-                file_name = file_id +'.jpg'
-                current_dir = os.getcwd()
-                relative_path = os.path.join('App/sources/upload_image/', file_name)
-                file_path = os.path.abspath(os.path.join(current_dir,relative_path))
+        if(shared_vars.capture):
+            shared_vars.capture = False
+            print("capture flag captured!")
+            
+            # 根据 frame_bytes 内容进行哈希运算
+            file_hash = hashlib.sha1(image_data_bytes).hexdigest()
+            file_id = str(uuid.uuid5(uuid.NAMESPACE_DNS,file_hash))
 
-                print(file_path)
+            # 得到文件名
+            file_name = file_id +'.jpg'
+            current_dir = os.getcwd()
+            relative_path = os.path.join('App/sources/upload_image/', file_name)
+            file_path = os.path.abspath(os.path.join(current_dir,relative_path))
 
-                # 保存JPG格式的图片
-                with open(file_path,'wb') as f:
-                    f.write(buffer)
-                
-                # 保存文件名到公共变量文件
-                shared_vars.file_name = file_name
-                shared_vars.save_finished = True
+            print(file_path)
 
-                # 注意若保存frame则是以PNG格式无损保存
-                #cv2.imwrite(file_path,frame)
+            # 保存JPG格式的图片
+            with open(file_path,'wb') as f:
+                f.write(buffer)
+            
+            # 保存文件名到公共变量文件
+            shared_vars.file_name = file_name
+            shared_vars.save_finished = True
 
-                print("picture saved at",file_path)
-                
+            # 注意若保存frame则是以PNG格式无损保存
+            #cv2.imwrite(file_path,frame)
 
-            # 指定字节流类型image/jpeg
-            yield  (b'--frame\r\n'
-                    b'Content-Type: image/jpeg\r\n\r\n' + image_data_bytes + b'\r\n')
+            print("picture saved at",file_path)
+            
+
+        # 指定字节流类型image/jpeg
+        yield  (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + image_data_bytes + b'\r\n')
         
 def testCamera():
     # 创建摄像头对象
