@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>野山参等级分类系统</title>
+    <link rel="stylesheet" href="static/layui/css/layui.css">
+    <link rel="stylesheet" href="static/layui/css/global.css">
+    <script src="static/layui/layui.js"></script>
+</head>
+
+<body>
+    <fieldset class="layui-elem-field" style="margin: 10px 10px;">
+        <legend>摄像头设置</legend>
+        <div class="layui-field-box layui-text ws-text">
+            下面的左框中会显示视频流数据，可在右边设置相应的参数。
+        </div>
+    </fieldset>
+    <div class="layui-row layui-col-space5" style="margin: 10px 10px;">
+        <!--左边显示视频流-->
+        <div class="layui-col-md6">
+            <div class="layui-upload-drag" style="display: block;">
+                <div class="layui-row" style="display: flex;align-items: center;justify-content: center;">
+                    <i class="layui-icon layui-icon-video"></i>
+                </div>
+                <span style="display: inline-block;vertical-align: middle;">摄像头数据流</span>
+                <div class="layui-row" style="justify-content: center;">
+                    <img src="{{ url_for('user.camera_ginseng_stream') }}" alt="" height="80%" width="80%"
+                        style="margin-bottom:10px;">
+                </div>
+
+            </div>
+        </div>
+        <!--右边显示相关的设置参数-->
+        <div class="layui-col-md6">
+            <div class="layui-upload-drag" style="display: block;">
+                <!--表单-->
+                <div class="layui-form">
+                    <!--表单项 补光灯1-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">补光灯1</label>
+                        <div class="layui-input-block">
+                            <input type="checkbox" name="light-1" title="开启|关闭" lay-skin="switch"
+                                lay-filter="light-1">
+                        </div>
+                    </div>
+                    <!--表单项 补光灯2-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">补光灯2</label>
+                        <div class="layui-input-block">
+                            <input type="checkbox" name="light-2" title="开启|关闭" lay-skin="switch"
+                                lay-filter="light-2">
+                        </div>
+                    </div>
+                    <!--表单项 正向旋转-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">设定正转值</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="postive_rotate" lay-verify="required|number" class="layui-input"
+                                id="postive-rotate">
+                        </div>
+                        <div class="layui-form-mid" style="padding: 0!important;">
+                            <button type="button" class="layui-btn layui-btn-primary" id="start-postive-rotate">电机正转</button>
+                        </div>
+                    </div>
+                    <!--表单项 反向旋转-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">设定反转值</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="negative_rotate" lay-verify="required|number" class="layui-input"
+                                id="negative-rotate">
+                        </div>
+                        <div class="layui-form-mid" style="padding: 0!important;">
+                            <button type="button" class="layui-btn layui-btn-primary" id="start-negative-rotate">电机反转</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+<script>
+    layui.use(['form','util'],function(){
+        var form = layui.form;
+        var layer = layui.layer;
+        var util = layui.util;
+        var $ = layui.$;
+
+        var operation;
+        var operation_id;
+        var selected;
+        var rotate_angle;
+        form.on('switch(light-1)',function(data){
+            console.log(data.elem.name);
+            operation = "light"
+            operation_id = 1;
+            if(data.elem.checked){
+                console.log(data.elem.name + "selected");
+                selected = true;
+            }else{
+                console.log(data.elem.name + "not selected");
+                selected = false;
+            }
+            switchLight();
+        });
+        form.on('switch(light-2)',function(data){
+            console.log(data.elem.name);
+            operation = "light"
+            operation_id = 2;
+            if(data.elem.checked){
+                console.log(data.elem.name + "selected");
+                selected = true;
+            }else{
+                console.log(data.elem.name + "not selected");
+                selected = false;
+            }
+            switchLight();
+        });
+        // layui 提供了自己的“不能为空”和“数字验证”策略
+        // form.verify({
+        //     numberOnly: [   // numberDecimal
+        //         /^\d+$/,    // 使用正则表达式验证 若还需要小数点，则改为 /^\d+(\.\d+)?$/
+        //         '只能输入数字'
+        //     ],
+        // });
+        $('#start-postive-rotate').on('click',function(){
+            form.verify({
+                postive_rotate: 'required|number', // name 选择器
+            });
+            rotate_angle = $('#postive-rotate').val(); // id 选择器
+            layer.msg(rotate_angle);
+            operation = "rotate";
+            operation_id = 1;
+            setRotateAngle();
+        });
+        function switchLight(){
+            $.ajax({
+                url: '/camera_settings',
+                method: 'POST',
+                data:{
+                    "operation": operation,
+                    "operation_id": operation_id,
+                    "selected": selected,
+                },
+                success: function (res) {
+                    console.log(res);
+                },
+                error: function (error) {
+                    console.log(error);
+                },
+            });
+        }
+        function setRotateAngle(){
+            $.ajax({
+                url: '/camera_settings',
+                method: 'POST',
+                data:{
+                    "operation": operation,
+                    "operation_id": operation_id,
+                    "rotate_angle": rotate_angle,
+                },
+                success: function (res) {
+                    console.log(res);
+                },
+                error: function (error) {
+                    console.log(error);
+                },
+            });
+        }
+    })
+
+</script>

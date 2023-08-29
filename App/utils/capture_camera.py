@@ -20,7 +20,7 @@ def camera_init():
     # 添加互斥锁避免潜在的线程安全问题
     # 在下面的函数中，互斥锁持有不释放将会导致无法退出解释器的问题，故暂时停用
     # with camera_lock:
-    print("start init")
+    print("start init camera")
     camera = cv2.VideoCapture(0,cv2.CAP_DSHOW)
     # 初始化参数包含以下几种：
     # 1. 无，此时启动速度最慢
@@ -30,7 +30,7 @@ def camera_init():
     height = 768
     camera.set(cv2.CAP_PROP_FRAME_WIDTH,width)
     camera.set(cv2.CAP_PROP_FRAME_HEIGHT,height)
-    print("end init")
+    print("end init camera")
 
 '''
 获得本地摄像头图像字节流传输

@@ -26,6 +26,7 @@ from App.models.models_user import UserModel
 from App.utils.infer_ginseng import infer_ginseng_image_backend
 from App.utils.crop_image import crop_ginseng_image_backend
 from App.utils.capture_camera import camera_ginseng_frames
+from App.utils.connect_serial import serial_turn_light,motor_angle_rotate
 
 import App.utils.shared_vars # 语义上的全局变量
 
@@ -257,10 +258,70 @@ def camera_ginseng_stream():
 
 '''
 渲染拍照推理页面的路由
+目的：显示拍照推理的页面
 '''
 @blue_user.route('/camera_ginseng_image', methods=['GET', 'POST'])
 def camera_ginseng_image():
     return render_template('camera_ginseng_image.html')
+
+'''
+渲染摄像设置页面的路由
+目的：对摄像头的相关参数进行设置
+'''
+@blue_user.route('/camera_settings', methods=['GET', 'POST'])
+def camera_settings():
+    if request.method == 'GET':
+        return render_template('camera_settings.html')
+    
+    # POST请求表示前端请求参数设置
+    if request.method == 'POST':
+        # 获取操作对象
+        operation = request.form.get('operation')
+
+        # 控制灯光
+        if operation == 'light':
+            operation_id = request.form.get('operation_id')
+            
+            if operation_id.isdigit():
+                operation_id = int(operation_id)
+                light_id = operation_id
+            else:
+                print("error operation id.")
+                return
+            selected = request.form.get('selected')
+            if(selected == 'true'):
+                turn_action=1
+            else:
+                turn_action=0
+            serial_thread = threading.Thread(target=serial_turn_light,args=(light_id,turn_action))
+            serial_thread.start()
+        
+        # 控制电机旋转
+        elif operation == 'rotate':
+            operation_id = request.form.get('operation_id')
+
+            if operation_id.isdigit():
+                operation_id = int(operation_id)
+                rotate_direction = operation_id
+            else:
+                print("error operation id.")
+                return
+            rotate_angle = request.form.get('rotate_angle')
+
+            print("operation is {},rotate_direction is {},rotate_angle is {}",operation,rotate_direction,rotate_angle)
+            serial_thread = threading.Thread(target=motor_angle_rotate,args=(120,1))
+            serial_thread.start()
+
+        # 执行完操作后向前端发回执
+        response = {
+            "code": 0,
+            "msg": "执行成功",
+            "data": {
+                
+            }
+        }
+
+        return jsonify(response)
 
 '''
 推理图片的路由
