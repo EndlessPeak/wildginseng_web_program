@@ -61,6 +61,7 @@ def draw_bbox(img, result,label_dict, out_path,threshold=0.3):
     img.save(out_path, quality=95)
 
 def write_result(result,label_dict,output_dir,threshold=0.3):
+    print("write predict start.")
     results = [] # 初始化空列表
     for res in result:
         cat_id, score, bbox = res[0], res[1], res[2:]
@@ -91,6 +92,8 @@ def write_result(result,label_dict,output_dir,threshold=0.3):
     # 使用 utf-8 编码
     with open(output_dir,'w',encoding='utf-8') as f:
         json.dump(results,f,ensure_ascii=False,indent=4)
+    
+    print("write predict end.")
 
 def init_predictor(model_file, params_file):
     '''

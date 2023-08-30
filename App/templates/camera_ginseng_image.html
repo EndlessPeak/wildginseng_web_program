@@ -104,6 +104,8 @@
                         "file_name": process_file_name //res.data.file_name
                     },
                     success: function (res) {
+                        //目前似乎有问题，下面是拟修正方法，待测试
+                        localStorage.setItem('infer_file_name',res.data.infer_file_name);
                         console.log(res);
                     },
                     error: function (error) {

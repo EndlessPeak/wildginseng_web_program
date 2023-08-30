@@ -257,12 +257,19 @@ def camera_ginseng_stream():
         return jsonify(response)
 
 '''
-渲染拍照推理页面的路由
+渲染手动拍照推理页面的路由
 目的：显示拍照推理的页面
 '''
 @blue_user.route('/camera_ginseng_image', methods=['GET', 'POST'])
 def camera_ginseng_image():
     return render_template('camera_ginseng_image.html')
+
+'''
+渲染自动拍照推理页面的路由
+'''
+@blue_user.route('/camera_ginseng_image_auto', methods=['GET', 'POST'])
+def camera_ginseng_image_auto():
+    return render_template('camera_ginseng_image_auto.html')
 
 '''
 渲染摄像设置页面的路由
@@ -427,6 +434,8 @@ def infer_ginseng_image_result():
         result = "二等参"
     elif result == "C":
         result = "等外参"
+    else:
+        result = "非人参"
 
     # 更新完成变量后向前端发回执
     response = {

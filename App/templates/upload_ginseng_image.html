@@ -85,7 +85,7 @@
                         // 解析响应
                         $('#ID-crop-image-preview').removeClass('layui-hide')
                             .find('img').attr('src', response.data.file_url);
-                        localStorage.setItem('crop_file_src',response.data.file_url);
+                        //localStorage.setItem('crop_file_src',response.data.file_url);
                         console.log(response);
                     },
                     error: function (error) {
@@ -111,9 +111,9 @@
                         "file_name": process_file_name //res.data.file_name
                     },
                     success: function (res) {
-                        //infer_file_name = res.data.infer_file_name;
+                        infer_file_name = res.data.infer_file_name;
                         //使用本地存储保存变量，以在子窗口中使用
-                        //localStorage.setItem('infer_file_name',infer_file_name);
+                        localStorage.setItem('infer_file_name',infer_file_name);
                         console.log(res);
                     },
                     error: function (error) {

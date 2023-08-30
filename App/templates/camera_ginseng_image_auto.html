@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>野山参等级分类系统</title>
+    <link rel="stylesheet" href="static/layui/css/layui.css">
+    <link rel="stylesheet" href="static/layui/css/global.css">
+    <script src="static/layui/layui.js"></script>
+</head>
+
+<body>
+    <fieldset class="layui-elem-field" style="margin: 10px 10px;">
+        <legend>视频拍照</legend>
+        <div class="layui-field-box layui-text ws-text">
+            <p>下面最左框内显示视频流数据，点击自动拍照后在右边的三个框中会显示拍照后的图片，自动裁剪后对图片展开推理。</p>
+            <p>自动拍照与推理的全流程大约需要1分钟，请耐心等待。</p>
+        </div>
+    </fieldset>
+    <div class="layui-row layui-col-space5" style="margin: 10px 10px;">
+        <!--1/4 显示视频流-->
+        <div class="layui-col-xs3">
+            <div class="layui-upload-drag" style="display: block;">
+                <div class="layui-row" style="display: flex;align-items: center;justify-content: center;">
+                    <i class="layui-icon layui-icon-video"></i>
+                </div>
+                <span style="display: inline-block;vertical-align: middle;">摄像头数据流</span>
+                <div class="layui-row" style="justify-content: center;">
+                    <img src="{{ url_for('user.camera_ginseng_stream') }}" alt="" height="80%" width="80%" style="margin-bottom:10px;">
+                </div>
+                
+            </div>
+        </div>
+        <!--2/4 显示第1次拍照得到的图片-->
+        <div class="layui-col-xs3">
+            <div class="layui-upload-drag" style="display: block;">
+                <div class="layui-row" style="display: flex;align-items: center;justify-content: center;">
+                    <i class="layui-icon layui-icon-video"></i>       
+                </div>
+                <span style="display: inline-block;vertical-align: middle;">拍照后的图片将会在此显示</span>
+                <div id="ID-camera-image-preview-1" class="layui-row layui-hide" style="justify-content: center;">
+                    <img src="" alt="拍照成功后渲染" height="80%" width="80%" style="margin-bottom:10px;">
+                </div>
+            </div>
+        </div>
+        <!--3/4 显示第2次拍照得到的图片-->
+        <div class="layui-col-xs3">
+            <div class="layui-upload-drag" style="display: block;">
+                <div class="layui-row" style="display: flex;align-items: center;justify-content: center;">
+                    <i class="layui-icon layui-icon-video"></i>       
+                </div>
+                <span style="display: inline-block;vertical-align: middle;">拍照后的图片将会在此显示</span>
+                <div id="ID-camera-image-preview-2" class="layui-row layui-hide" style="justify-content: center;">
+                    <img src="" alt="拍照成功后渲染" height="80%" width="80%" style="margin-bottom:10px;">
+                </div>
+            </div>
+        </div>
+        <!--4/4 显示第3次拍照得到的图片-->
+        <div class="layui-col-xs3">
+            <div class="layui-upload-drag" style="display: block;">
+                <div class="layui-row" style="display: flex;align-items: center;justify-content: center;">
+                    <i class="layui-icon layui-icon-video"></i>       
+                </div>
+                <span style="display: inline-block;vertical-align: middle;">拍照后的图片将会在此显示</span>
+                <div id="ID-camera-image-preview-3" class="layui-row layui-hide" style="justify-content: center;">
+                    <img src="" alt="拍照成功后渲染" height="80%" width="80%" style="margin-bottom:10px;">
+                </div>
+            </div>
+        </div>
+        
+        
+    </div>
+    <div class="layui-row">
+        <div class="layui-col-md12" style="display: flex;justify-content: center;">
+            <button id="ID-picture-button" class="layui-btn" lay-on="take-photos">
+                <i class="layui-icon layui-icon-camera-fill"></i> 拍照
+            </button>
+        </div>
+    </div>
+    
+</body>
+<script>
+    layui.use(['layer','util'],function(){
+        var layer = layui.layer;
+        var util = layui.util;
+        var $ = layui.$;
+
+        //保存三次拍照的结果的变量
+        var process_file_name1;
+        var process_file_name2;
+        var process_file_name3;
+
+        //保存三次推理的结果的变量
+        var infer_file_name1;
+        var infer_file_name2;
+        var infer_file_name3;
+
+        //旋转相关操作的参数（保持不动）
+        var operation = "rotate";
+        var operation_id = 1;
+        var rotate_angle = 120;
+
+        //AJAX方法的函数，使用 Promise 和 async/await 异步等待执行结果
+        //拍照的AJAX请求
+        function sendAjaxPicture(div_id){
+            return new Promise(function(resolve,reject){
+                $.ajax({
+                    url: '/camera_ginseng_stream',
+                    type: 'POST',
+                    data: {
+                        "capture": true,
+                    },
+                    // 后端的回复处理
+                    success: function(res){
+                        // 渲染拍照的图片
+                        $('#'+div_id).removeClass('layui-hide')
+                            .find('img').attr('src', res.data.file_url);
+                        var file_name = res.data.file_name;
+                        resolve(file_name); // 将获取到的文件名传递给 Promise 的 resolve 函数
+                        console.log(res);
+                    },
+                    error: function(error){
+                        reject(error);      // 请求失败时将错误信息传递给 Promise 的 reject 函数
+                        console.log(error);
+                    }
+                });
+            });
+        }
+
+        //AJAX方法的函数，使用 Promise 和 async/await 异步等待执行结果
+        //推理的AJAX请求
+        function sendAjaxInfer(process_file_name){
+            return new Promise(function(resolve,reject){
+                $.ajax({
+                    url: '/infer_ginseng_image',
+                    type: 'POST', // 根据实际情况选择请求类型
+                    data: {
+                        "file_name": process_file_name //res.data.file_name
+                    },
+                    success: function (res) {
+                        var file_name = res.data.infer_file_name;
+                        resolve(file_name); // 将获取到的文件名传递给 Promise 的 resolve 函数
+                        console.log(res);
+                    },
+                    error: function (error) {
+                        reject(error);      // 请求失败时将错误信息传递给 Promise 的 reject 函数
+                        console.log(error);
+                    }
+                });
+            });
+        }
+
+        //延时等待旋转结束
+        function delay(ms){
+            return new Promise(function(resolve){
+                setTimeout(resolve,ms);
+            });
+        }
+
+        //旋转120度的函数
+        function setRotateAngle(){
+            $.ajax({
+                url: '/camera_settings',
+                method: 'POST',
+                data:{
+                    "operation": operation,
+                    "operation_id": operation_id,
+                    "rotate_angle": rotate_angle,
+                },
+                success: function (res) {
+                    console.log(res);
+                },
+                error: function (error) {
+                    console.log(error);
+                },
+            });
+        }
+
+        //拍照和旋转综合函数
+        async function captureAndProcessImages(){
+            try {
+                //第1次拍照
+                process_file_name1 = await sendAjaxPicture('ID-camera-image-preview-1');
+                console.log("process_file_name1 is ",process_file_name1);
+                setRotateAngle();
+                
+                //等待8秒（旋转时间）
+                await delay(8000);
+                
+                //第2次拍照
+                process_file_name2 = await sendAjaxPicture('ID-camera-image-preview-2');
+                console.log("process_file_name2 is ",process_file_name2);
+                setRotateAngle();
+                //等待8秒（旋转时间）
+                await delay(8000);
+                
+                //第3次拍照
+                process_file_name3 = await sendAjaxPicture('ID-camera-image-preview-3');
+                console.log("process_file_name3 is ",process_file_name3);
+                
+                //拍照完之后执行推理
+                infer_file_name1 = await sendAjaxInfer(process_file_name1);
+                console.log("infer_file_name1 is ",infer_file_name1);
+                
+                //等待9秒（推理时间）
+                await delay(9000);
+                
+                infer_file_name2 = await sendAjaxInfer(process_file_name2);
+                console.log("infer_file_name2 is ",infer_file_name2);
+                
+                //等待9秒（推理时间）
+                await delay(9000);
+
+                infer_file_name3 = await sendAjaxInfer(process_file_name3);
+                console.log("infer_file_name3 is ",infer_file_name3);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        //当按下拍照按钮时,执行三次拍照逻辑
+        util.on('lay-on',{
+            'take-photos': function(){
+                // 按钮禁用时不执行下面的逻辑
+                if ($('#ID-picture-button').hasClass('layui-btn-disabled')) return;
+                //注意ajax方法是异步执行的，因此需要等待变量更新完成
+                //可以使用嵌套回调，但是代码会损失可读性；因此使用 async 和 await 处理异步操作
+                $('#ID-picture-button').addClass('layui-btn-disabled');//先禁用
+                captureAndProcessImages();
+                $('#ID-picture-button').removeClass('layui-btn-disabled');//先禁用
+            }
+        });
+    });
+</script>
