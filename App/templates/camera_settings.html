@@ -36,11 +36,11 @@
         <div class="layui-col-md6">
             <div class="layui-upload-drag" style="display: block;">
                 <!--表单-->
-                <div class="layui-form">
+                <div class="layui-form" lay-filter="val-filter">
                     <!--表单项 补光灯1-->
                     <div class="layui-form-item">
                         <label class="layui-form-label">补光灯1</label>
-                        <div class="layui-input-block">
+                        <div class="layui-input-inline">
                             <input type="checkbox" name="light-1" title="开启|关闭" lay-skin="switch"
                                 lay-filter="light-1">
                         </div>
@@ -48,7 +48,7 @@
                     <!--表单项 补光灯2-->
                     <div class="layui-form-item">
                         <label class="layui-form-label">补光灯2</label>
-                        <div class="layui-input-block">
+                        <div class="layui-input-inline">
                             <input type="checkbox" name="light-2" title="开启|关闭" lay-skin="switch"
                                 lay-filter="light-2">
                         </div>
@@ -60,8 +60,11 @@
                             <input type="text" name="postive_rotate" lay-verify="required|number" class="layui-input"
                                 id="postive-rotate">
                         </div>
-                        <div class="layui-form-mid" style="padding: 0!important;">
-                            <button type="button" class="layui-btn layui-btn-primary" id="start-postive-rotate">电机正转</button>
+                        <!--style="padding: 0!important;"-->
+                        <div class="layui-form-mid">
+                            <button type="button" class="layui-btn layui-btn" id="start-postive-rotate">
+                                电机正转
+                            </button>
                         </div>
                     </div>
                     <!--表单项 反向旋转-->
@@ -72,9 +75,29 @@
                                 id="negative-rotate">
                         </div>
                         <div class="layui-form-mid" style="padding: 0!important;">
-                            <button type="button" class="layui-btn layui-btn-primary" id="start-negative-rotate">电机反转</button>
+                            <button type="button" class="layui-btn layui-btn" id="start-negative-rotate">
+                                电机反转
+                            </button>
                         </div>
                     </div>
+                    <!--表单项 称重-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">称重值</label>
+                        <div class="layui-input-inline">
+                            <!--称重值由后端返回，不需要验证-->
+                            <input type="text" name="weigh" class="layui-input" id="weigh">
+                        </div>
+                        <!--style="padding: 0!important;"-->
+                        <div class="layui-form-mid" >
+                            <button type="button" class="layui-btn layui-btn" id="start-weigh">
+                                称重
+                            </button>
+                            <button type="button" class="layui-btn layui-btn" id="clean-weigh">
+                                去皮清零
+                            </button>
+                        </div>
+                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -92,6 +115,7 @@
         var operation_id;
         var selected;
         var rotate_angle;
+        $('#weigh').prop('disabled',true);
         form.on('switch(light-1)',function(data){
             console.log(data.elem.name);
             operation = "light"
@@ -126,14 +150,40 @@
         //     ],
         // });
         $('#start-postive-rotate').on('click',function(){
-            form.verify({
-                postive_rotate: 'required|number', // name 选择器
-            });
+            // 代码未生效
+            // form.verify({
+            //     postive_rotate: 'required|number', // name 选择器
+            // });
+            var isvalid = form.validate('#postive-rotate');
+            if(!isvalid)
+                return;
             rotate_angle = $('#postive-rotate').val(); // id 选择器
-            layer.msg(rotate_angle);
+            //layer.msg(rotate_angle);
             operation = "rotate";
             operation_id = 1;
             setRotateAngle();
+        });
+        $('#start-negative-rotate').on('click',function(){
+            // 代码未生效
+            // form.verify({
+            //     postive_rotate: 'required|number', // name 选择器
+            // });
+            var isvalid = form.validate('#postive-rotate');
+            if(!isvalid)
+                return;
+            rotate_angle = $('#negative-rotate').val(); // id 选择器
+            //layer.msg(rotate_angle);
+            operation = "rotate";
+            operation_id = 2;
+            setRotateAngle();
+        });
+        $('#start-weigh').on('click',function(){
+            operation = 'weigh';
+            weigh();    //获取称重
+        });
+        $('#clean-weigh').on('click',function(){
+            operation = 'clean_weigh';
+            clean_weigh();  //清零称重
         });
         function switchLight(){
             $.ajax({
@@ -160,6 +210,40 @@
                     "operation": operation,
                     "operation_id": operation_id,
                     "rotate_angle": rotate_angle,
+                },
+                success: function (res) {
+                    console.log(res);
+                },
+                error: function (error) {
+                    console.log(error);
+                },
+            });
+        }
+        function weigh(){
+            $.ajax({
+                url: '/camera_settings',
+                method: 'POST',
+                data:{
+                    "operation": operation,
+                },
+                success: function (res) {
+                    console.log(res);
+                    //var weigh = res.data.weigh;
+                    form.val('val-filter', {
+                        "weigh": res.data.weigh,
+                    });
+                },
+                error: function (error) {
+                    console.log(error);
+                },
+            });
+        }
+        function clean_weigh(){
+            $.ajax({
+                url: '/camera_settings',
+                method: 'POST',
+                data:{
+                    "operation": operation,
                 },
                 success: function (res) {
                     console.log(res);

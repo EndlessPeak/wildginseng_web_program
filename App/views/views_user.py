@@ -26,7 +26,7 @@ from App.models.models_user import UserModel
 from App.utils.infer_ginseng import infer_ginseng_image_backend
 from App.utils.crop_image import crop_ginseng_image_backend
 from App.utils.capture_camera import camera_ginseng_frames
-from App.utils.connect_serial import serial_turn_light,motor_angle_rotate
+from App.utils.connect_serial import serial_turn_light,motor_angle_rotate,weigh,clean_weigh
 
 import App.utils.shared_vars # 语义上的全局变量
 
@@ -278,6 +278,15 @@ def camera_settings():
         # 获取操作对象
         operation = request.form.get('operation')
 
+        # 先定义执行完操作后向前端发送的回执，方便称重等需要在字典中添加键值对的操作
+        response = {
+            "code": 0,
+            "msg": "执行成功",
+            "data": {
+                
+            }
+        }
+
         # 控制灯光
         if operation == 'light':
             operation_id = request.form.get('operation_id')
@@ -309,17 +318,18 @@ def camera_settings():
             rotate_angle = request.form.get('rotate_angle')
 
             print("operation is {},rotate_direction is {},rotate_angle is {}",operation,rotate_direction,rotate_angle)
-            serial_thread = threading.Thread(target=motor_angle_rotate,args=(120,1))
+            serial_thread = threading.Thread(target=motor_angle_rotate,args=(120,rotate_direction))
             serial_thread.start()
 
-        # 执行完操作后向前端发回执
-        response = {
-            "code": 0,
-            "msg": "执行成功",
-            "data": {
-                
-            }
-        }
+        # 控制称重，获取称重值之后返回
+        elif operation == 'weigh':
+            # print("views receive weigh operation")
+            result = weigh()
+            response['data']['weigh'] = result
+            
+        # 控制称重清零（去皮）
+        elif operation == 'clean_weigh':
+            clean_weigh()
 
         return jsonify(response)
 
