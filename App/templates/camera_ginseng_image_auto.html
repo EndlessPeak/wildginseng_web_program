@@ -177,6 +177,43 @@
             });
         }
 
+        // 显示推理进度
+        function display_infer_percent(pictureIndex){
+            return new Promise(function(resolve,reject){
+                layer.msg('开始进行推理第' + pictureIndex + '张图片' + '请勿刷新页面！', { icon: 0 }, function () {
+                    //回调
+                    layer.msg('执行推理大约需要10s时间，请耐心等待。请勿刷新页面！', {
+                        icon: 16,
+                        shade: 0.05,
+                        end: function(){
+                            //异步操作完成后，传递参数给resolve
+                            //可以传空值，但是必须告诉resolve执行完成了
+                            var result = "推理等待结束";
+                            resolve(result);
+                        }
+                    });  
+                });
+            });
+        }
+
+        // 显示推理结果
+        function display_infer_result(){
+            //打开子窗口
+            layer.open({
+                type: 2,
+                title: '推理结果',
+                content: '/infer_ginseng_image_auto_result',
+                area: ['420px','350px'],
+                maxmin: true,
+                btn:['确定'],
+                btnAlign: 'c',
+                yes: function(index,layero){
+                    layer.close(index);
+                    $('#ID-picture-button').removeClass('layui-btn-disabled');//启用
+                },
+            });
+        }
+
         //拍照和旋转综合函数
         async function captureAndProcessImages(){
             try {
@@ -199,21 +236,32 @@
                 process_file_name3 = await sendAjaxPicture('ID-camera-image-preview-3');
                 console.log("process_file_name3 is ",process_file_name3);
                 
+                //等待前端将图片同步到框中
+                await delay(1000);
+
                 //拍照完之后执行推理
                 infer_file_name1 = await sendAjaxInfer(process_file_name1);
                 console.log("infer_file_name1 is ",infer_file_name1);
-                
+                localStorage.setItem('infer_file_name1',infer_file_name1);
+                await display_infer_percent(1);
+
                 //等待9秒（推理时间）
-                await delay(9000);
+                //await delay(9000);
                 
                 infer_file_name2 = await sendAjaxInfer(process_file_name2);
                 console.log("infer_file_name2 is ",infer_file_name2);
+                localStorage.setItem('infer_file_name2',infer_file_name2);
+                await display_infer_percent(2);
                 
                 //等待9秒（推理时间）
-                await delay(9000);
+                //await delay(9000);
 
                 infer_file_name3 = await sendAjaxInfer(process_file_name3);
                 console.log("infer_file_name3 is ",infer_file_name3);
+                localStorage.setItem('infer_file_name3',infer_file_name3);
+                await display_infer_percent(3);
+
+                display_infer_result();
             } catch (error) {
                 console.log(error);
             }
@@ -228,7 +276,6 @@
                 //可以使用嵌套回调，但是代码会损失可读性；因此使用 async 和 await 处理异步操作
                 $('#ID-picture-button').addClass('layui-btn-disabled');//先禁用
                 captureAndProcessImages();
-                $('#ID-picture-button').removeClass('layui-btn-disabled');//先禁用
             }
         });
     });

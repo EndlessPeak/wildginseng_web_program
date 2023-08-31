@@ -404,7 +404,10 @@ def infer_ginseng_image_result():
     
     result = "None Result."
 
-    if os.path.exists(output_dir):
+    if not os.path.exists(output_dir):
+        print("msg is failed.")
+        msg = "failed"
+    else:
         print("msg is succeed.")
         msg = "succeed"
 
@@ -423,10 +426,7 @@ def infer_ginseng_image_result():
                 highest_score = score
                 highest_category = category
         
-        result = highest_category
-    else:
-        print("msg is failed.")
-        msg = "failed"
+        result = highest_category 
     
     if result == "A":
         result = "一等参"
@@ -447,6 +447,110 @@ def infer_ginseng_image_result():
     }
 
     return jsonify(response)
+
+'''
+查看三个推理图片结果的路由
+目的：从推理文件夹查看 json 文件内容，给出推理结果
+备注：该路由可以调用上面的服务路由
+'''
+@blue_user.route('/infer_ginseng_image_auto_result', methods=['GET', 'POST'])
+def infer_ginseng_image_auto_result():
+    if request.method == 'GET':
+        return render_template('infer_result_auto.html')
+    
+    # 下面是POST请求的处理方法
+    file_name1 = request.form.get('file_name1')
+    file_name2 = request.form.get('file_name2')
+    file_name3 = request.form.get('file_name3')
+
+    output_dir1 = current_app.config['INFER_IMAGE_FOLDER'] + file_name1
+    print("infered json file_name 1:",file_name1)
+    print("infered json dir and file_name 1:",output_dir1)
+    output_dir2 = current_app.config['INFER_IMAGE_FOLDER'] + file_name2
+    print("infered json file_name 2:",file_name2)
+    print("infered json dir and file_name 2:",output_dir2)
+    output_dir3 = current_app.config['INFER_IMAGE_FOLDER'] + file_name3
+    print("infered json file_name 3:",file_name3)
+    print("infered json dir and file_name 3:",output_dir3)
+
+    result_list = []
+
+    if not os.path.exists(output_dir1):
+        print("msg is failed due to output_dir 1 not exists.")
+        msg = "failed"
+    elif not os.path.exists(output_dir2):
+        print("msg is failed due to output_dir 2 not exists.")
+        msg = "failed"
+    elif not os.path.exists(output_dir3):
+        print("msg is failed due to output_dir 3 not exists.")
+        msg = "failed"
+    else:
+        print("msg is succeed.")
+        msg = "succeed"
+
+        # 统计所有的类别结果到 result_list
+        for output_dir in [output_dir1,output_dir2,output_dir3]:
+            # 读取文件
+            with open(output_dir,encoding='utf-8') as file:
+                data = json.load(file)
+
+            highest_score = float(0) # 最高分首先设置为0
+            highest_category = ''
+
+            for item in data:
+                score = item['score']
+                category = item['category']
+
+                if score > highest_score:
+                    highest_score = score
+                    highest_category = category
+            
+            result_list.append([highest_category, highest_score])
+        
+        # 进行多数表决，若没有多数，则取置信度最高的结果
+        vote_dict = {}
+        
+        for result in result_list:
+            category , score = result[0],result[1]
+
+            if category not in vote_dict:
+                vote_dict[category] = [score]
+            else:
+                vote_dict[category].append(score)
+        
+        max_count = 0       # 计数表决数
+        max_category = None # 最终的表决结果
+
+        for category, score_list in vote_dict.items():
+            count = len(score_list)
+
+            if count > max_count:
+                max_count = count
+                max_category = category
+            elif count == max_count and max_category is not None:
+                max_score = max(score_list)
+                if score_list.count(max_score) > score_list.count(vote_dict[max_category][0]):
+                    max_category = category
+
+    if max_category == "A":
+        max_category = "一等参"
+    elif max_category == "B":
+        max_category = "二等参"
+    elif max_category == "C":
+        max_category = "等外参"
+    else:
+        max_category = "非人参"
+
+    # 更新完成变量后向前端发回执
+    response = {
+        "code": 0,
+        "msg": msg,
+        "data": {
+            "result": max_category,
+        }
+    }
+
+    return jsonify(response)    
 
 '''
 以下为测试路由
