@@ -19,14 +19,7 @@
                 style="transform:scale(0.3);vertical-align: top;margin-top: -12px;margin-right: -20px;">
             <a href="/">野山参等级分类管理系统</a>
         </div>
-        <div class="ws-header-menu ws-bg-light" style="position: absolute;left:240px">
-            <ul class="layui-nav layui-bg-gray ws-bg-light">
-                <!--控制左侧栏是否隐藏的按钮-->
-                <li class="layui-nav-item layui-show-xs-inline-block" lay-header-event="menuLeft">
-                    <a href="javascript:;"><i id="leftEnumIcon" class="layui-icon layui-icon-spread-left"></i></a>
-                </li>
-            </ul>
-        </div>
+        
         <div class="ws-header-menu ws-bg-light layui-layout-right">
             <ul class="layui-nav layui-bg-gray ws-bg-light">
                 <li class="layui-nav-item">
@@ -59,39 +52,22 @@
                     -->
                     </div>
                     <ul>
-                        <li lay-options="{id: 101}">
-                            <div class="layui-menu-body-title">上传图片推理</div>
+                        <li lay-options="{id: 110}">
+                            <div class="layui-menu-body-title">摄像参数设置</div>
                         </li>
-                        <li lay-options="{id: 102}">
-                            <div class="layui-menu-body-title">手动拍照推理</div>
-                        </li>
-                        <li lay-options="{id: 103}">
+                        <li lay-options="{id: 113}">
                             <div class="layui-menu-body-title">自动拍照推理</div>
                         </li>
-                        <li lay-options="{id: 104}">
-                            <div class="layui-menu-body-title">摄像参数设置</div>
+                        <li lay-options="{id: 112}">
+                            <div class="layui-menu-body-title">手动拍照推理</div>
+                        </li>
+                        <li lay-options="{id: 111}">
+                            <div class="layui-menu-body-title">上传图片推理</div>
                         </li>
                     </ul>
                 </li>
                 <!--<li class="layui-menu-item-divider"></li>-->
-                <li class="layui-menu-item-group layui-menu-item-down"
-                    lay-options="{type: 'group', isAllowSpread: false}">
-                    <div class="layui-menu-body-title">
-                        管理参茸
-                        <!--
-                            显示图标
-                            <i class="layui-icon layui-icon-up"></i>
-                        -->
-                    </div>
-                    <ul>
-                        <li lay-options="{id: 110}">
-                            <div class="layui-menu-body-title">当日参茸</div>
-                        </li>
-                        <li lay-options="{id: 111}">
-                            <div class="layui-menu-body-title">历史参茸</div>
-                        </li>
-                    </ul>
-                </li>
+                
 
                 <li class="layui-menu-item-group layui-menu-item-down"
                     lay-options="{type: 'group', isAllowSpread: false}">
@@ -103,9 +79,6 @@
                         -->
                     </div>
                     <ul>
-                        <li lay-options="{id: 120}">
-                            <div class="layui-menu-body-title">资料设置</div>
-                        </li>
                         <li lay-options="{id: 121}">
                             <div class="layui-menu-body-title">注销登录</div>
                         </li>
@@ -126,10 +99,7 @@
     </div>
 
 
-    <!--缩放页面时显示的工具按钮-->
-    <div class="ws-menu-bar layui-bg-green layui-hide" lay-on="simiMenuLeft">
-        <a href="javascript:;"><i class="layui-icon layui-icon-spread-left"></i></a>
-    </div>
+    
     <div class="layui-footer ws-footer">
         <p style="line-height: 20px;">
             Copyright © 2023
@@ -162,18 +132,20 @@
                 case 100:
                     $('#index-page-main-part').attr('src', '/display_statistics');
                     break;
-                case 101:
-                    $('#index-page-main-part').attr('src', '/upload_ginseng_image');
-                    break;
-                case 102:
-                    $('#index-page-main-part').attr('src', '/camera_ginseng_image');
-                    break;
-                case 103:
-                    $('#index-page-main-part').attr('src', '/camera_ginseng_image_auto');
-                    break;
-                case 104:
+                case 110:
                     $('#index-page-main-part').attr('src', '/camera_settings');
                     break;
+                case 111:
+                    $('#index-page-main-part').attr('src', '/upload_ginseng_image');
+                    break;
+                case 112:
+                    $('#index-page-main-part').attr('src', '/camera_ginseng_image');
+                    break;
+                case 113:
+                    $('#index-page-main-part').attr('src', '/camera_ginseng_image_auto');
+                    break;
+                    
+                    
                 //管理参茸
                 //用户管理
                 case 121:

@@ -1,0 +1,81 @@
+<!--管理参茸-->
+<li class="layui-menu-item-group layui-menu-item-down"
+lay-options="{type: 'group', isAllowSpread: false}">
+<div class="layui-menu-body-title">
+    管理参茸
+    <!--
+        显示图标
+        <i class="layui-icon layui-icon-up"></i>
+    -->
+</div>
+<ul>
+    <li lay-options="{id: 110}">
+        <div class="layui-menu-body-title">当日参茸</div>
+    </li>
+    <li lay-options="{id: 111}">
+        <div class="layui-menu-body-title">历史参茸</div>
+    </li>
+</ul>
+</li>
+
+<!--用户设置，隐藏了资料设置-->
+<li class="layui-menu-item-group layui-menu-item-down"
+    lay-options="{type: 'group', isAllowSpread: false}">
+    <div class="layui-menu-body-title">
+        用户设置
+        <!--
+            显示图标
+            <i class="layui-icon layui-icon-up"></i>
+        -->
+    </div>
+    <ul>
+        <li lay-options="{id: 120}">
+            <div class="layui-menu-body-title">资料设置</div>
+        </li>
+        <li lay-options="{id: 121}">
+            <div class="layui-menu-body-title">注销登录</div>
+        </li>
+    </ul>
+</li>
+
+<div class="layui-row layui-col-space15">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <i class="fa fa-warning icon"></i>数据统计
+        </div>
+        <div class="layui-card-body">
+            Hello
+        </div>
+    </div>
+</div>
+    
+<!--显示全局导航部分-->
+<div class="layui-row layui-col-space15">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <i class="fa fa-credit-card icon icon-blue"></i>快捷入口
+        </div>
+        <div class="layui-card-body">
+            Hello
+        </div>
+    </div>
+</div>
+
+<!--显示视频流的图标-->
+<div class="layui-row" style="display: flex;align-items: center;justify-content: center;">
+    <i class="layui-icon layui-icon-video"></i>
+</div>
+
+<!--左侧隐藏栏-->
+<div class="ws-header-menu ws-bg-light" style="position: absolute;left:240px">
+    <ul class="layui-nav layui-bg-gray ws-bg-light">
+        <!--控制左侧栏是否隐藏的按钮-->
+        <li class="layui-nav-item layui-show-xs-inline-block" lay-header-event="menuLeft">
+            <a href="javascript:;"><i id="leftEnumIcon" class="layui-icon layui-icon-spread-left"></i></a>
+        </li>
+    </ul>
+</div>
+<!--缩放页面时显示的工具按钮-->
+<div class="ws-menu-bar layui-bg-green layui-hide" lay-on="simiMenuLeft">
+    <a href="javascript:;"><i class="layui-icon layui-icon-spread-left"></i></a>
+</div>

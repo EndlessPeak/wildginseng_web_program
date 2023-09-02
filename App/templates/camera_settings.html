@@ -19,21 +19,20 @@
     </fieldset>
     <div class="layui-row layui-col-space5" style="margin: 10px 10px;">
         <!--左边显示视频流-->
-        <div class="layui-col-md6">
+        <div class="layui-col-xs6">
             <div class="layui-upload-drag" style="display: block;">
-                <div class="layui-row" style="display: flex;align-items: center;justify-content: center;">
-                    <i class="layui-icon layui-icon-video"></i>
-                </div>
-                <span style="display: inline-block;vertical-align: middle;">摄像头数据流</span>
+                <div class="layui-row" style="display: inline-block;vertical-align: middle;margin-bottom: 10px;">
+                    <p style="font-size: 15px;">摄像头实时数据流</p>
+                </div> 
                 <div class="layui-row" style="justify-content: center;">
-                    <img src="{{ url_for('user.camera_ginseng_stream') }}" alt="" height="80%" width="80%"
+                    <img src="{{ url_for('user.camera_ginseng_stream') }}" alt="" height="60%" width="60%"
                         style="margin-bottom:10px;">
                 </div>
 
             </div>
         </div>
         <!--右边显示相关的设置参数-->
-        <div class="layui-col-md6">
+        <div class="layui-col-xs6">
             <div class="layui-upload-drag" style="display: block;">
                 <!--表单-->
                 <div class="layui-form" lay-filter="val-filter">
@@ -41,7 +40,7 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">补光灯1</label>
                         <div class="layui-input-inline">
-                            <input type="checkbox" name="light-1" title="开启|关闭" lay-skin="switch"
+                            <input type="checkbox" name="light-1" title="点击关闭|点击开启" lay-skin="switch"
                                 lay-filter="light-1">
                         </div>
                     </div>
@@ -49,7 +48,7 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">补光灯2</label>
                         <div class="layui-input-inline">
-                            <input type="checkbox" name="light-2" title="开启|关闭" lay-skin="switch"
+                            <input type="checkbox" name="light-2" title="点击关闭|点击开启" lay-skin="switch"
                                 lay-filter="light-2">
                         </div>
                     </div>
@@ -60,9 +59,8 @@
                             <input type="text" name="postive_rotate" lay-verify="required|number" class="layui-input"
                                 id="postive-rotate">
                         </div>
-                        <!--style="padding: 0!important;"-->
-                        <div class="layui-form-mid">
-                            <button type="button" class="layui-btn layui-btn" id="start-postive-rotate">
+                        <div class="layui-form-mid" style="padding: 0!important;">
+                            <button type="button" class="layui-btn layui-btn-sm" id="start-postive-rotate">
                                 电机正转
                             </button>
                         </div>
@@ -75,7 +73,7 @@
                                 id="negative-rotate">
                         </div>
                         <div class="layui-form-mid" style="padding: 0!important;">
-                            <button type="button" class="layui-btn layui-btn" id="start-negative-rotate">
+                            <button type="button" class="layui-btn layui-btn-sm" id="start-negative-rotate">
                                 电机反转
                             </button>
                         </div>
@@ -87,12 +85,11 @@
                             <!--称重值由后端返回，不需要验证-->
                             <input type="text" name="weigh" class="layui-input" id="weigh">
                         </div>
-                        <!--style="padding: 0!important;"-->
-                        <div class="layui-form-mid" >
-                            <button type="button" class="layui-btn layui-btn" id="start-weigh">
+                        <div class="layui-form-mid" style="padding: 0!important;">
+                            <button type="button" class="layui-btn layui-btn-sm" id="start-weigh">
                                 称重
                             </button>
-                            <button type="button" class="layui-btn layui-btn" id="clean-weigh">
+                            <button type="button" class="layui-btn layui-btn-sm" id="clean-weigh">
                                 去皮清零
                             </button>
                         </div>

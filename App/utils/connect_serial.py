@@ -159,11 +159,13 @@ def set_motor_angle(angle):
     command_type = b"\x0A"
     command_id = b"\x02"
 
-    # 旋转角度（默认为120）
-    if angle == 120:
-        data_angle = b"\x00\x00\xF0\x42"
-    else:
-        return
+    data_angle = struct.pack('<f',float(angle))
+    # data_angle = float_to_hex(angle)
+
+    # if angle == 120:
+    #     data_angle = b"\x00\x00\xF0\x42"
+    # else:
+    #     return
 
     data_frame = protocol_header + length + device_id + reserved + \
           index_bytes + command_type + command_id + data_angle

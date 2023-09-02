@@ -19,27 +19,25 @@
     </fieldset>
     <div class="layui-row layui-col-space5" style="margin: 10px 10px;">
         <!--左边显示视频流-->
-        <div class="layui-col-md6">
+        <div class="layui-col-xs6">
             <div class="layui-upload-drag" style="display: block;">
-                <div class="layui-row" style="display: flex;align-items: center;justify-content: center;">
-                    <i class="layui-icon layui-icon-video"></i>
-                </div>
-                <span style="display: inline-block;vertical-align: middle;">摄像头数据流</span>
+                <div class="layui-row" style="display: inline-block;vertical-align: middle;margin-bottom: 10px;">
+                    <p style="font-size: 15px;">摄像头实时数据流</p>
+                </div> 
                 <div class="layui-row" style="justify-content: center;">
-                    <img src="{{ url_for('user.camera_ginseng_stream') }}" alt="" height="80%" width="80%" style="margin-bottom:10px;">
+                    <img src="{{ url_for('user.camera_ginseng_stream') }}" alt="" height="60%" width="60%">
                 </div>
                 
             </div>
         </div>
         <!--右边显示拍照得到的图片-->
-        <div class="layui-col-md6">
+        <div class="layui-col-xs6">
             <div class="layui-upload-drag" style="display: block;">
-                <div class="layui-row" style="display: flex;align-items: center;justify-content: center;">
-                    <i class="layui-icon layui-icon-video"></i>       
-                </div>
-                <span style="display: inline-block;vertical-align: middle;">拍照后的图片将会在此显示</span>
+                <div class="layui-row" style="display: inline-block;vertical-align: middle;margin-bottom: 10px;">
+                    <p style="font-size: 15px;">拍照后的图片将会在此显示</p>
+                </div> 
                 <div id="ID-camera-image-preview" class="layui-row layui-hide" style="justify-content: center;">
-                    <img src="" alt="拍照成功后渲染" height="80%" width="80%" style="margin-bottom:10px;">
+                    <img src="" alt="拍照成功后渲染" height="60%" width="60%">
                 </div>
             </div>
         </div>

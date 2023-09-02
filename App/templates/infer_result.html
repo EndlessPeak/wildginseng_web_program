@@ -14,7 +14,7 @@
 <body>
     <fieldset class="layui-elem-field" style="margin: 10px 10px;">
         <legend>推理结果</legend>
-        <div class="layui-field-box layui-text ws-text">
+        <div id="message1" class="layui-field-box layui-text ws-text">
             <span>推理结果将在下方显示。</span>
         </div>
         <div class="layui-row">
@@ -30,7 +30,7 @@
                 <p id="infer-result-text" style="font-size:30px;text-align:center;"></p>
             </div>
         </div>
-        <div class="layui-field-box layui-text ws-text">
+        <div id="message2" class="layui-field-box layui-text ws-text">
             <span>若在20秒内仍未显示推理结果，请关闭该页面后重试。</span>
         </div>
         <!-- <div class="layui-row" style="display: flex;justify-content: center;">
@@ -66,7 +66,8 @@
                     if(res.msg === 'succeed'){
                         clearInterval(intervalId);//清除定时器
                         //console.log(res.data);
-                        
+                        $('#message1').addClass("layui-hide");
+                        $('#message2').addClass('layui-hide');
                         $('#infer-result-text').text("结果为 "+res.data.result);
                     } 
                 },

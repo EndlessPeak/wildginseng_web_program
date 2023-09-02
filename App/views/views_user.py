@@ -23,6 +23,8 @@ from flask import Blueprint, request, send_from_directory, \
     url_for, Response
 from App.models.models_user import UserModel
 
+from App.extensions import db
+
 from App.utils.infer_ginseng import infer_ginseng_image_backend
 from App.utils.crop_image import crop_ginseng_image_backend
 from App.utils.capture_camera import camera_ginseng_frames
@@ -86,9 +88,43 @@ def check_login_status():
 def check_login_route():
     # user.user_login 是 user 蓝图的登录路由使用的方法
     # print(request.endpoint)
-    if request.endpoint != "user.user_login" and not check_login_status():
+    if request.endpoint != "user.user_login" and request.endpoint != "user.user_register" and not check_login_status():
         # 实际上就是 redirect("/login")
         return redirect(url_for("user.user_login")) 
+
+'''
+注册的路由
+'''
+@blue_user.route("/register",methods=['GET','POST'])
+def user_register():
+    if request.method == 'GET':
+        return render_template('register.html')
+    
+    # 注册验证
+    if request.method == 'POST':
+        response = {
+            'success': True,
+            'message': 'Login Successful',
+        }
+
+        username = request.form.get('username')
+        password = request.form.get('password')
+        name = request.form.get('name')
+        contact = request.form.get('contact')
+
+        exist_user = UserModel.query.filter_by(username=username).first()
+        if exist_user:
+            response['success'] = False
+            response['message'] = "用户名已存在"
+            return jsonify(response)
+
+        print("username is {},password is {},name is {},contact is {}",username,password,name,contact)
+
+        user = UserModel(username=username,password=password,name=name,contact=contact)
+        db.session.add(user)
+        db.session.commit()
+
+        return jsonify(response)
 
 '''
 注销的路由
@@ -325,7 +361,7 @@ def camera_settings():
             rotate_angle = request.form.get('rotate_angle')
 
             print("operation is {},rotate_direction is {},rotate_angle is {}",operation,rotate_direction,rotate_angle)
-            serial_thread = threading.Thread(target=motor_angle_rotate,args=(120,rotate_direction))
+            serial_thread = threading.Thread(target=motor_angle_rotate,args=(rotate_angle,rotate_direction))
             serial_thread.start()
 
         # 控制称重，获取称重值之后返回
