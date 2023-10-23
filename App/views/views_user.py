@@ -28,7 +28,8 @@ from App.extensions import db
 from App.utils.infer_ginseng import infer_ginseng_image_backend
 from App.utils.crop_image import crop_ginseng_image_backend
 from App.utils.capture_camera import camera_ginseng_frames
-from App.utils.connect_serial import serial_turn_light,motor_angle_rotate,weigh,clean_weigh
+from App.utils.connect_serial import serial_turn_light,motor_angle_rotate,weigh, \
+    clean_weigh,calibration_weight
 
 import App.utils.shared_vars # 语义上的全局变量
 
@@ -71,9 +72,9 @@ def user_login():
         else:
             # 登录失败
             response = {
-            'success': False,
-            # 'message': 'Login failed'
-        }
+                'success': False,
+                # 'message': 'Login failed'
+            }
         return jsonify(response)
 
 # 检查登录状态
@@ -373,6 +374,15 @@ def camera_settings():
         # 控制称重清零（去皮）
         elif operation == 'clean_weigh':
             clean_weigh()
+
+        # 控制重量标定
+        elif operation == 'calibration_weight':
+            print("views receive calibration_weight")
+            calibration_weight_var = int(request.form.get('calibration_weight_var'))
+            print("calibration_weight_var is:",calibration_weight_var)
+            # result = 
+            calibration_weight(calibration_weight_var=calibration_weight_var)
+            # response['data']['calibration'] = result
 
         return jsonify(response)
 

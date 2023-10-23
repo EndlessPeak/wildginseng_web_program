@@ -92,9 +92,21 @@
                             <button type="button" class="layui-btn layui-btn-sm" id="clean-weigh">
                                 去皮清零
                             </button>
+                            
                         </div>
                     </div>
-                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">称重标定值</label>
+                        <div class="layui-input-inline">
+                            <!--称重标定值，需要验证-->
+                            <input type="text" name="calibration-weight-var" lay-verify="required|number" class="layui-input" id="calibration-weight-var">
+                        </div>
+                        <div class="layui-form-mid" style="padding: 0!important;">
+                            <button type="button" class="layui-btn layui-btn-sm" id="calibration-weight">
+                                称重校准
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -112,6 +124,7 @@
         var operation_id;
         var selected;
         var rotate_angle;
+        var calibration_weight_var;
         $('#weigh').prop('disabled',true);
         form.on('switch(light-1)',function(data){
             console.log(data.elem.name);
@@ -165,7 +178,7 @@
             // form.verify({
             //     postive_rotate: 'required|number', // name 选择器
             // });
-            var isvalid = form.validate('#postive-rotate');
+            var isvalid = form.validate('#negative-rotate');
             if(!isvalid)
                 return;
             rotate_angle = $('#negative-rotate').val(); // id 选择器
@@ -181,6 +194,15 @@
         $('#clean-weigh').on('click',function(){
             operation = 'clean_weigh';
             clean_weigh();  //清零称重
+        });
+        $('#calibration-weight').on('click',function(){
+            var isvalid = form.validate('#calibration-weight-var');
+            if(!isvalid)
+                return;
+            operation = 'calibration_weight';
+            calibration_weight_var = $('#calibration-weight-var').val();
+            console.log("abcd");
+            calibration_weight();  //称重标定
         });
         function switchLight(){
             $.ajax({
@@ -241,6 +263,22 @@
                 method: 'POST',
                 data:{
                     "operation": operation,
+                },
+                success: function (res) {
+                    console.log(res);
+                },
+                error: function (error) {
+                    console.log(error);
+                },
+            });
+        }
+        function calibration_weight(){
+            $.ajax({
+                url: '/camera_settings',
+                method: 'POST',
+                data:{
+                    "operation": operation,
+                    "calibration_weight_var": calibration_weight_var,
                 },
                 success: function (res) {
                     console.log(res);

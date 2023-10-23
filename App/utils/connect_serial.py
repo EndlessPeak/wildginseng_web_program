@@ -259,6 +259,80 @@ def motor_angle_rotate(angle=120,direction=0):
     set_motor_angle(angle)
     let_motor_angle(direction)
 
+def calibration_weight(calibration_weight_var=0):
+    '''
+    本函数用于对称重传感器进行标定
+    '''
+    protocol_header = b"\xA5\x5A"
+    length = b"\x24\x00"
+    device_id = b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+    reserved = b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+
+    # index_bytes 计算
+    index_self_add()
+
+    command_type = b"\x10"
+    command_id = b"\x08"
+
+    # 获取标定值并转为16进制
+    data_weight =  (calibration_weight_var*100).to_bytes(4,'little')
+
+    print("data_weight is:",data_weight) 
+
+    data_frame = protocol_header + length + device_id + reserved + \
+          index_bytes + command_type + command_id + data_weight
+    
+    crc_bytes = crc_16_caculate(data_frame=data_frame)
+
+    # 发送数据帧
+    send_frame = data_frame + crc_bytes
+    debug_send_frame(send_frame=send_frame)
+    ser.write(send_frame)
+
+    # 接收数据帧
+    receive_frame = ser.read(33) # 读取收到的数据
+    receive_frame_hex = ' '.join([hex(byte)[2:].zfill(2) for byte in receive_frame])
+    print("receive order: ",receive_frame_hex)
+
+    byte_data = int(receive_frame[30]) # 从数据帧中取第31个数据
+    # num = int.from_bytes(byte_data,'little')
+    # byte_data_num = struct.unpack('<f',byte_data)[0]
+    print("byte_data is:",byte_data)
+
+    # 接收数据帧
+    debug_receive_frame(receive_bytes=33)
+    
+    # 平台回复
+    # 实测严格按通信协议来的话无法继续正常称重
+    # 可能平台回复需要放到设备的第二次回复之前
+    # after_calibration_weight()
+
+
+def after_calibration_weight():
+    '''
+    本函数用于称重传感器标定结束后的平台回复
+    '''
+    protocol_header = b"\xA5\x5A"
+    length = b"\x21\x00"
+    device_id = b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+    reserved = b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+
+    # index_bytes 计算
+    index_self_add()
+
+    command_type = b"\x81"
+    command_id = b"\x06"
+
+    data_frame = protocol_header + length + device_id + reserved + \
+          index_bytes + command_type + command_id
+    
+    crc_bytes = crc_16_caculate(data_frame=data_frame)
+
+    # 发送数据帧
+    send_frame = data_frame + crc_bytes
+    debug_send_frame(send_frame=send_frame)
+    ser.write(send_frame)
+
 def weigh():
     '''
     本函数用于获取称重传感器的值
